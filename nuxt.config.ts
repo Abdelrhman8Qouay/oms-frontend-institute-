@@ -1,8 +1,10 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
     compatibilityDate: '2024-11-01',
+
     // devtools: { enabled: true }
     pages: true,
+
     modules: [
         '@vueuse/nuxt',
         '@nuxtjs/tailwindcss',
@@ -32,8 +34,8 @@ export default defineNuxtConfig({
     css: ['./assets/css/main.css'],
 
     /*
-      [Nuxt tailwindcss][https://tailwindcss.nuxtjs.org/getting-started/installation]
-    */
+    [Nuxt tailwindcss][https://tailwindcss.nuxtjs.org/getting-started/installation]
+  */
     tailwindcss: {
         cssPath: ['~/assets/css/tailwind.css', { injectPosition: 'first' }],
         config: {},
@@ -42,17 +44,17 @@ export default defineNuxtConfig({
     },
 
     /*
-    [nuxt/axios][https://axios.nuxtjs.org/setup]
-  */
+  [nuxt/axios][https://axios.nuxtjs.org/setup]
+*/
     // axios: {
     //   baseURL: process.env.API_BASE_URL || "http://localhost:3000", // Backend API URL
     // },
 
     /*
-    [nuxt/auth][https://auth.nuxtjs.org/guide/setup]
-    . Configure the auth module to work with your backend (Nest.js).
-    . Use JWT for secure authentication and role-based access control.
-  */
+  [nuxt/auth][https://auth.nuxtjs.org/guide/setup]
+  . Configure the auth module to work with your backend (Nest.js).
+  . Use JWT for secure authentication and role-based access control.
+*/
     // auth: {
     //   strategies: {
     //     local: {
@@ -79,29 +81,29 @@ export default defineNuxtConfig({
     // },
 
     /* 
-    [Nuxt Eslint][https://eslint.nuxt.com/packages/module]
-    If you prefer to use ESLint for formatting, we also directly integrate with ESLint Stylistic to make it easy.
-    You can opt-in by setting config.stylistic to true in the eslint module options.
-  */
+  [Nuxt Eslint][https://eslint.nuxt.com/packages/module]
+  If you prefer to use ESLint for formatting, we also directly integrate with ESLint Stylistic to make it easy.
+  You can opt-in by setting config.stylistic to true in the eslint module options.
+*/
     eslint: {
         config: {
             stylistic: true, // <---
             /*
-        stylistic: {
-          indent: 'tab',
-          semi: true,
-          // ...
-        }
-      */
+      stylistic: {
+        indent: 'tab',
+        semi: true,
+        // ...
+      }
+    */
         },
     },
 
     /*
-    [nuxt-socket-io][https://nuxt.com/modules/socket-io]
-    Socket.io client and server module for Nuxt
-    . Purpose: Enables real-time communication with the backend.
-    . Use Case: Real-time order updates, notifications, and IoT integration.
-  */
+  [nuxt-socket-io][https://nuxt.com/modules/socket-io]
+  Socket.io client and server module for Nuxt
+  . Purpose: Enables real-time communication with the backend.
+  . Use Case: Real-time order updates, notifications, and IoT integration.
+*/
     io: {
         sockets: [
             {
@@ -125,15 +127,20 @@ export default defineNuxtConfig({
             '2xl': 1536,
         },
         /* How to use <image>
-      <NuxtImg src="https://images.unsplash.com/<id>" />
-    */
+          <NuxtImg src="https://images.unsplash.com/<id>" />
+        */
+    },
 
-        // Runtime configuration
-        runtimeConfig: {
-            public: {
-                apiBaseUrl: process.env.API_BASE_URL || 'http://localhost:3000', // Public API URL
-                socketUrl: process.env.SOCKET_URL || 'http://localhost:3000', // Public Socket URL
-            },
+    // Runtime configuration
+    runtimeConfig: {
+        public: {
+            apiBaseUrl: process.env.API_BASE_URL || 'http://localhost:3000', // Public API URL
+            socketUrl: process.env.SOCKET_URL || 'http://localhost:3000', // Public Socket URL
+            apiTimeout: process.env.API_TIMEOUT,
         },
+    },
+
+    devtools: {
+        enabled: true,
     },
 })

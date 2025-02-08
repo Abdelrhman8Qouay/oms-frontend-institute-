@@ -89,6 +89,14 @@ Check out the [deployment documentation](https://nuxt.com/docs/getting-started/d
 ### version 2
 
 1. [Build "Cashier" page] with needed of files and the logic
+2. [Build (axios, store) plugins]
+3. [Build (APIs) logic] for more better calling the APIs for the pages
+4. [Build (Layouts) components]
+5. [Refactor (Cashier) Files]
+6. [Build (useCache) composable] for cache handling with (VueUse) lib
+7. [Enhanced Full Logic]
+
+### version 3
 
 ## Modules Installed
 

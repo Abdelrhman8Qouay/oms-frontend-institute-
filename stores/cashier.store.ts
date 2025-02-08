@@ -1,86 +1,68 @@
 import { defineStore } from 'pinia'
-import { useAxios } from '@vueuse/integrations/useAxios'
 import { ref, computed } from 'vue'
-
-interface CustomerDetails {
-    name: string
-    phone: string
-    address?: string
-}
-
-interface MenuItem {
-    id: string
-    name: string
-    price: number
-    description?: string
-    categoryId: string
-    isAvailable: boolean
-    preparationTime?: number
-    customization?: {
-        options?: {
-            name: string
-            choices: string[]
-            price?: number
-        }[]
-        allergens?: string[]
-        dietary?: string[]
-    }
-}
-
-interface SelectedItem extends MenuItem {
-    quantity: number
-    totalPrice: number
-}
+import type { CustomerDetails, SelectedItem } from '~/utils/types/cashier.type'
+import { OrderTypes } from '~/utils/types/order.type'
+import { useApi } from '~/composables/useApi'
+import type { AxiosRequestConfig } from 'axios'
+import { useCache } from '~/composables/useCache'
+import type { MenuObject, MenuItem, MenuCategory } from '~/utils/types/menu.type'
 
 export const useCashierStore = defineStore('cashier', () => {
-    const axios = useAxios()
+    const menuStore = useMenuStore()
 
     // State
+    const currentMenu = ref<MenuObject>({})
+    const currentCategory = ref<MenuCategory>({})
     const selectedItems = ref<SelectedItem[]>([])
-    const customerDetails = ref<CustomerDetails | null>(null)
-    const orderType = ref<'dine-in' | 'takeaway' | 'delivery'>('dine-in')
-    const categories = ref<{ id: string; name: string; displayOrder: number }[]>([])
-    const currentCategory = ref<string | null>(null)
-    const categoryItems = ref<MenuItem[]>([])
-    const isLoading = ref(false)
-    const error = ref<string | null>(null)
+    const customerDetails = ref<CustomerDetails>({
+        name: '',
+        phone: '',
+        address: '',
+    })
+    const orderType = ref<OrderTypes>(OrderTypes.DINE_IN)
+    const isMenuLoading = ref(false)
 
     // Computed
+    const orderTypes = computed(() => Object.values(OrderTypes))
+
     const total = computed(() => {
         return selectedItems.value.reduce((sum, item) => sum + item.totalPrice, 0)
     })
 
+    const isDelivery = computed(() => orderType.value === OrderTypes.DELIVERY)
+
     const canSubmitOrder = computed(() => {
         if (selectedItems.value.length === 0) return false
-        if (orderType.value === 'delivery' && !customerDetails.value) return false
+        if (isDelivery.value && !customerDetails.value.name) return false
         return true
     })
 
     // Actions
-    async function fetchCategories(menuId: string) {
+    async function fetchCurrentMenu() {
+        isMenuLoading.value = true
         try {
-            isLoading.value = true
-            const { data } = await useAxios(`/cashier/categories/${menuId}`)
-            categories.value = data.sort((a, b) => a.displayOrder - b.displayOrder)
-        } catch (err) {
-            error.value = 'Failed to fetch categories'
-            console.error(err)
-        } finally {
-            isLoading.value = false
-        }
-    }
+            const menuId = menuStore.menuIdCache.cashier.get()
+            const { data } = await useApi().cashier.getCurrentMenu<MenuObject>(menuId)
 
-    async function fetchCategoryItems(categoryId: string) {
-        try {
-            isLoading.value = true
-            const { data } = await useAxios(`/cashier/items/${categoryId}`)
-            categoryItems.value = data.filter((item: MenuItem) => item.isAvailable)
-            currentCategory.value = categoryId
+            // Ensure the data is valid
+            if (!data || typeof data !== 'object') {
+                throw new Error('Invalid menu data returned from the API')
+            }
+
+            // Update the current menu and cache
+            currentMenu.value = data as MenuObject
+            menuStore.menuCache.cashier.set(currentMenu.value as MenuObject)
+            menuStore.menuIdCache.cashier.set(currentMenu.value.id as string)
+
+            // Select the first category by default
+            if (currentMenu.value.categories?.length) {
+                currentCategory.value = currentMenu.value.categories[0]
+            }
         } catch (err) {
-            error.value = 'Failed to fetch items'
-            console.error(err)
+            console.error('Failed to fetch current menu:', err)
+            throw err
         } finally {
-            isLoading.value = false
+            isMenuLoading.value = false
         }
     }
 
@@ -118,21 +100,27 @@ export const useCashierStore = defineStore('cashier', () => {
         customerDetails.value = details
     }
 
-    function setOrderType(type: 'dine-in' | 'takeaway' | 'delivery') {
+    function setOrderType(type: OrderTypes) {
         orderType.value = type
-        if (type !== 'delivery') {
-            customerDetails.value = null
+        if (type !== OrderTypes.DELIVERY) {
+            customerDetails.value = {
+                name: '',
+                phone: '',
+                address: '',
+            }
         }
+    }
+
+    function selectCategory(category: MenuCategory) {
+        currentCategory.value = category
     }
 
     async function submitOrder() {
         if (!canSubmitOrder.value) return
 
         try {
-            isLoading.value = true
-            await useAxios('/cashier/orders', {
-                method: 'post',
-                data: {
+            await useApi().cashier.createOrder(
+                {
                     type: orderType.value,
                     items: selectedItems.value.map((item) => ({
                         menuItemId: item.id,
@@ -144,43 +132,50 @@ export const useCashierStore = defineStore('cashier', () => {
                     customerDetails: customerDetails.value,
                     totalPrice: total.value,
                 },
-            })
+                { method: 'POST' }
+            )
 
             // Reset state after successful order
-            selectedItems.value = []
-            customerDetails.value = null
-            orderType.value = 'dine-in'
+            resetStateOrder()
         } catch (err) {
-            error.value = 'Failed to submit order'
-            console.error(err)
-        } finally {
-            isLoading.value = false
+            console.error('Failed to submit order:', err)
+            throw err
         }
+    }
+
+    function resetStateOrder() {
+        selectedItems.value = []
+        customerDetails.value = {
+            name: '',
+            phone: '',
+            address: '',
+        }
+        orderType.value = OrderTypes.DINE_IN
     }
 
     return {
         // State
+        currentMenu,
+        currentCategory,
         selectedItems,
         customerDetails,
         orderType,
-        categories,
-        currentCategory,
-        categoryItems,
-        isLoading,
-        error,
+        isMenuLoading,
 
         // Computed
+        orderTypes,
         total,
+        isDelivery,
         canSubmitOrder,
 
         // Actions
-        fetchCategories,
-        fetchCategoryItems,
+        fetchCurrentMenu,
         addItem,
         removeItem,
         updateItemQuantity,
         setCustomerDetails,
         setOrderType,
+        selectCategory,
         submitOrder,
     }
 })
