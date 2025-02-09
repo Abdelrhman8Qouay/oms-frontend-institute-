@@ -9,6 +9,7 @@ export interface FetchAxiosOptionsWithInitialData {
     abortPrevious?: boolean | undefined
     immediate?: boolean | undefined
     initialData: any
+    onBefore?: (() => void) | undefined
     onError?: ((e: unknown) => void) | undefined
     onFinish?: ((e: unknown) => void) | undefined
     onSuccess?: ((e: unknown) => void) | undefined
@@ -41,7 +42,9 @@ export const useApi = () => {
     ): Promise<FetchApiAxios<T>> => {
         const url = typeof endpoint === 'function' ? endpoint() : endpoint
 
-        const axiosInstance = useAxios<T>(url, { ...options }, $api, axiosOptions as any)
+        const { onBefore, ...rest } = axiosOptions
+
+        const axiosInstance = useAxios<T>(url, { ...options }, $api, rest as any)
 
         return {
             response: axiosInstance.response,
@@ -54,6 +57,15 @@ export const useApi = () => {
             cancel: axiosInstance.cancel,
             isCanceled: axiosInstance.isCanceled,
             execute: async (urlOverride?: string, config?: AxiosRequestConfig) => {
+                // Call onBefore hook before executing the request
+                if (onBefore) {
+                    try {
+                        onBefore()
+                    } catch (error) {
+                        console.error('Error in onBefore hook:', error)
+                    }
+                }
+
                 return await axiosInstance.execute(urlOverride || url, { ...options, ...config })
             },
         }
@@ -76,6 +88,12 @@ export const useApi = () => {
 
             getCurrentMenu: <T = MenuObject>(menuId: string, options?: AxiosRequestConfig, axiosOptions?: FetchAxiosOptionsWithInitialData) =>
                 fetchApi<T>(ENDPOINTS.CASHIER.CURRENT_CASHIER_MENU(menuId), options, axiosOptions),
+        },
+        chef: {
+            getOrderQueue: () => useAxios(ENDPOINTS.CHEF.GET_ORDER_QUEUE, { method: 'GET' }, $api),
+            claimOrder: (orderId: string) => useAxios(ENDPOINTS.CHEF.CLAIM_ORDER(orderId), { method: 'POST' }, $api),
+            completeOrder: (orderId: string) => useAxios(ENDPOINTS.CHEF.COMPLETE_ORDER(orderId), { method: 'POST' }, $api),
+            getOrderDetails: (orderId: string) => useAxios(ENDPOINTS.CHEF.GET_ORDER_DETAILS(orderId), { method: 'GET' }, $api),
         },
         admin: {
             getStats: (options?: AxiosRequestConfig, axiosOptions?: FetchAxiosOptionsWithInitialData) => fetchApi(ENDPOINTS.ADMIN_DASHBOARD.GET_STATS, options, axiosOptions),

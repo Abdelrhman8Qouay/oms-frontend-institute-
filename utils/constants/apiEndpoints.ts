@@ -7,7 +7,7 @@ export const ENDPOINTS = {
     },
     CASHIER: {
         CREATE_ORDER: '/cashier/orders',
-        CURRENT_CASHIER_MENU: (menuId: string) => `/cashier/menu/${menuId}`,
+        CURRENT_CASHIER_MENU: (menuId: string) => `/cashier/menu/current/${menuId}`,
         GET_MENU: (menuId: string) => `/cashier/menu/${menuId}`,
         GET_CATEGORIES: (menuId: string) => `/cashier/categories/${menuId}`,
         GET_ITEMS: (categoryId: string) => `/cashier/items/${categoryId}`,

@@ -1,6 +1,6 @@
 <template>
     <div>
-        <h1>Welcome to the homepage</h1>
+        <h1 class="">Welcome to the homepage</h1>
         <pre>{{ data }}df</pre>
     </div>
 </template>

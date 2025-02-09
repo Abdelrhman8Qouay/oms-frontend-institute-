@@ -98,6 +98,22 @@ Check out the [deployment documentation](https://nuxt.com/docs/getting-started/d
 
 ### version 3
 
+1. [Added (format) functions] to the "utils" folder
+2. [Fixed (Tailwindcss) tool] inside the app to works fine
+3. [Enhanced (Cashier) page]
+4. [Build (Chef) page]
+   [Build (useWebsocket) composable]
+5. [Added (Loader, OrderCard) components]
+6. [Clear Logic separated]
+7. [Refactored (Socket.io) for client]
+   [Removed (useSocket) composable]
+8. [Enhanced (Chef) Page logic]
+   [Configured (Socket-client)]
+
+### version 4
+
+1. [Enhanced (Chef) Page logic]
+
 ## Modules Installed
 
 ### Core Nuxt Modules
@@ -108,6 +124,7 @@ Check out the [deployment documentation](https://nuxt.com/docs/getting-started/d
 -   auth/next (module > package)
     . Purpose: Handles authentication and authorization.
     . Use Case: User login, logout, and role-based access control.
+-   uuid (UUIDs handler)
 
 #### **Authentication Workflow**
 
@@ -168,9 +185,13 @@ Check out the [deployment documentation](https://nuxt.com/docs/getting-started/d
 
 ### Real-time Communication
 
--   nuxt-socket-io (socket.io-client)
+-   socket.io socket.io-client (socket.io-client)
     . Purpose: Enables real-time communication with the backend.
     . Use Case: Real-time order updates, notifications, and IoT integration.
+    ```bash
+    npm install socket.io socket.io-client
+    npm install --save-dev @types/socket.io-client
+    ```
 
 ## VueUse Installed & Used
 

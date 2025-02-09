@@ -2,22 +2,50 @@
 export default defineNuxtConfig({
     compatibilityDate: '2024-11-01',
 
-    // devtools: { enabled: true }
+    devtools: { enabled: false },
     pages: true,
 
     modules: [
         '@vueuse/nuxt',
         '@nuxtjs/tailwindcss',
         '@nuxt/image',
-        '@pinia/nuxt',
-        '@nuxt/eslint',
-        // '@sidebase/nuxt-auth',
-        'nuxt-socket-io',
-        // [magic-regexp][https://regexp.dev/guide]
-        'magic-regexp/nuxt',
+        '@pinia/nuxt', // '@sidebase/nuxt-auth',
+        '@nuxt/eslint', // [magic-regexp][https://regexp.dev/guide]
         // "@nuxtjs/axios",
         // "@nuxtjs/auth-next",
+        'magic-regexp/nuxt',
+        '@formkit/auto-animate',
+        '@nuxtjs/google-fonts',
+        'nuxt-icon',
     ],
+
+    googleFonts: {
+        display: 'swap', // 'auto' | 'block' | 'swap' | 'fallback' | 'optional'
+        preload: true,
+        families: {
+            Roboto: true,
+            Inter: [400, 700],
+            'Josefin+Sans': true,
+            Lato: [100, 300],
+            Raleway: {
+                wght: [100, 400],
+                ital: [100],
+            },
+        },
+    },
+
+    /*
+        [Nitro Guid websocket][https://nitro.build/guide/websocket]
+        [How to use (With Nuxt)][https://socket.io/how-to/use-with-nuxt]
+        Socket.io client and server module for Nuxt
+        . Purpose: Enables real-time communication with the backend.
+        . Use Case: Real-time order updates, notifications, and IoT integration.
+    */
+    nitro: {
+        experimental: {
+            websocket: true,
+        },
+    },
 
     build: {
         terser: {
@@ -31,15 +59,22 @@ export default defineNuxtConfig({
         extractCSS: true,
     },
 
-    css: ['./assets/css/main.css'],
+    css: ['~/assets/css/main.css'],
+    postcss: {
+        plugins: {
+            tailwindcss: {},
+            autoprefixer: {},
+        },
+    },
 
     /*
     [Nuxt tailwindcss][https://tailwindcss.nuxtjs.org/getting-started/installation]
   */
     tailwindcss: {
-        cssPath: ['~/assets/css/tailwind.css', { injectPosition: 'first' }],
+        cssPath: ['~/assets/css/main.css', { injectPosition: 'first' }],
         config: {},
-        viewer: true,
+        viewer: process.env.NODE_ENV === 'development', // provide with the config viewer on Nuxt DevTools
+        editorSupport: process.env.NODE_ENV === 'development', // take advantage of some DX utilities
         exposeConfig: false,
     },
 
@@ -98,21 +133,6 @@ export default defineNuxtConfig({
         },
     },
 
-    /*
-  [nuxt-socket-io][https://nuxt.com/modules/socket-io]
-  Socket.io client and server module for Nuxt
-  . Purpose: Enables real-time communication with the backend.
-  . Use Case: Real-time order updates, notifications, and IoT integration.
-*/
-    io: {
-        sockets: [
-            {
-                name: 'main',
-                url: process.env.SOCKET_URL || 'http://localhost:3000',
-            },
-        ],
-    },
-
     image: {
         quality: 100,
         format: ['webp', 'jpeg', 'jpg', 'png'],
@@ -138,9 +158,5 @@ export default defineNuxtConfig({
             socketUrl: process.env.SOCKET_URL || 'http://localhost:3000', // Public Socket URL
             apiTimeout: process.env.API_TIMEOUT,
         },
-    },
-
-    devtools: {
-        enabled: true,
     },
 })

@@ -1,6 +1,9 @@
 import { defineStore } from 'pinia'
 import { useCache } from '~/composables/useCache'
 import type { MenuObject } from '~/utils/types/menu.type'
+import { v4 as uuidv4 } from 'uuid'
+
+const generateUUID = () => uuidv4()
 
 export const useMenuStore = defineStore('menu', () => {
     // Cache keys for different users/pages
@@ -19,9 +22,9 @@ export const useMenuStore = defineStore('menu', () => {
 
     // Cache for menuId (shared across pages)
     const menuIdCache = {
-        cashier: useCache<string>({ key: cacheKeys.cashier + '_id', defaultValue: 'default_' + cacheKeys.cashier + '_id', storageType: 'memory' }),
-        adminHome: useCache<string>({ key: cacheKeys.adminHome + '_id', defaultValue: 'default_' + cacheKeys.adminHome + '_id', storageType: 'memory' }),
-        adminMenus: useCache<string>({ key: cacheKeys.adminMenus + '_id', defaultValue: 'default_' + cacheKeys.adminMenus + '_id', storageType: 'memory' }),
+        cashier: useCache<string>({ key: cacheKeys.cashier + '_id', defaultValue: generateUUID(), storageType: 'local' }),
+        adminHome: useCache<string>({ key: cacheKeys.adminHome + '_id', defaultValue: generateUUID(), storageType: 'local' }),
+        adminMenus: useCache<string>({ key: cacheKeys.adminMenus + '_id', defaultValue: generateUUID(), storageType: 'local' }),
     }
 
     return {

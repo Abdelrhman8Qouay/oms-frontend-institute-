@@ -1,10 +1,6 @@
-module.exports = {
-    purge: [],
-    media: false, // or 'media' or 'class'
+export default {
+    content: ['./app.vue', './components/**/*.{vue,js,ts}', './pages/**/*.{vue,js,ts}', './layouts/**/*.{vue,js,ts}', './plugins/**/*.{js,ts}'],
     theme: {
-        extend: {},
-    },
-    variants: {
         extend: {},
     },
     plugins: [],

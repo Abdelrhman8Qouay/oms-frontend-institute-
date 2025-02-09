@@ -8,21 +8,21 @@
                     <!-- Name Input -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Name</label>
-                        <input v-model="cashierStore.customerDetails.name" type="text"
+                        <input v-model="form.name" type="text"
                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" />
                     </div>
 
                     <!-- Phone Input -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Phone</label>
-                        <input v-model="cashierStore.customerDetails.phone" type="tel"
+                        <input v-model="form.phone" type="tel"
                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" />
                     </div>
 
-                    <!-- Address Input -->
-                    <div v-if="cashierStoreRef.isDelivery">
+                    <!-- Address Input (only if delivery is selected) -->
+                    <div v-if="isDelivery">
                         <label class="block text-sm font-medium text-gray-700">Delivery Address</label>
-                        <textarea v-model="cashierStore.customerDetails.address" rows="3"
+                        <textarea v-model="form.address" rows="3"
                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" />
                     </div>
                 </div>
@@ -43,18 +43,44 @@
 </template>
 
 <script setup lang="ts">
-import { useCashierStore } from '~/stores/cashier.store';
-import { storeToRefs } from 'pinia';
-import type { CustomerDetails } from '~/utils/types/cashier.type';
-const cashierStore = useCashierStore()
-const cashierStoreRef = storeToRefs(cashierStore)
+import type { CustomerDetails } from "~/utils/types/cashier.type";
 
+// Props
+const props = defineProps<{
+    customerDetails: CustomerDetails;
+    isDelivery: boolean;
+}>();
+
+// Emits
 const emits = defineEmits<{
-    (e: 'close'): void
-    (e: 'submit', details: CustomerDetails): void
-}>()
+    (e: "close"): void;
+    (e: "submit", details: CustomerDetails): void;
+    (e: "update:customerDetails", details: CustomerDetails): void;
+}>();
 
+// Reactive copy of customerDetails
+const form = ref<CustomerDetails>({ ...props.customerDetails });
+
+// Watch for parent prop updates and sync them
+watch(
+    () => props.customerDetails,
+    (newDetails) => {
+        form.value = { ...newDetails };
+    },
+    { deep: true }
+);
+
+// Emit updates when form changes
+watch(
+    form,
+    (newForm) => {
+        emits("update:customerDetails", newForm);
+    },
+    { deep: true }
+);
+
+// Handle form submission
 function handleSubmit() {
-    emits('submit', cashierStore.customerDetails)
+    emits("submit", form.value);
 }
 </script>

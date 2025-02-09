@@ -13,23 +13,36 @@ interface CacheOptions<T> {
 class MemoryStorage implements StorageLike {
     private store = new Map<string, string>()
 
-    getItem(key: string) {
+    getItem(key: string): string | null {
         return this.store.get(key) || null
     }
 
-    setItem(key: string, value: string) {
+    setItem(key: string, value: string): void {
         this.store.set(key, value)
     }
 
-    removeItem(key: string) {
+    removeItem(key: string): void {
         this.store.delete(key)
+    }
+
+    clear(): void {
+        this.store.clear()
+    }
+
+    key(index: number): string | null {
+        return Array.from(this.store.keys())[index] || null
+    }
+
+    get length(): number {
+        return this.store.size
     }
 }
 
 export function useCache<T>({ key, defaultValue, storageType = 'local', ttl, validateFn }: CacheOptions<T>) {
+    // Define storage adapters
     const storageMap: Record<'local' | 'session' | 'memory', StorageLike> = {
-        local: process.client ? localStorage : new MemoryStorage(),
-        session: process.client ? sessionStorage : new MemoryStorage(),
+        local: typeof localStorage !== 'undefined' ? localStorage : new MemoryStorage(),
+        session: typeof sessionStorage !== 'undefined' ? sessionStorage : new MemoryStorage(),
         memory: new MemoryStorage(),
     }
 
