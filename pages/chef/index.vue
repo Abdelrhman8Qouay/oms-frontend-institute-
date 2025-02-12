@@ -28,7 +28,7 @@
         </header>
 
         <!-- Kanban Board -->
-        <div class="w-full h-max">
+        <div class="w-full h-max" v-auto-animate>
             <div v-if="isQueueGetLoading" class="w-full h-full flex justify-center items-center">
                 <CommonLoader :prevent-interaction="true" animation-type="fade" />
             </div>
@@ -72,16 +72,18 @@ import { OrderSortBy, OrderStatus, OrderTypes } from '~/utils/types/order.type';
 import { useAxios } from '@vueuse/integrations/useAxios.mjs';
 import { ENDPOINTS } from '~/utils/constants/apiEndpoints';
 import { formatReadableText } from '~/utils/functions/format';
+import { UserRole } from '~/utils/types/user.type';
+import type { OrderUpdateListened } from '~/utils/types/chef.type';
 
-const { $api, $socket } = useNuxtApp(); // Access Axios and Socket from plugin
+const { $api } = useNuxtApp(); // Access Axios from plugin
 
-// State
+// ===================================== State
+const { isConnected, connectSocket, joinRoom, listenToEvent } = useSocketIo();
 const orders = ref<any[]>([]);
 const filterType = ref('all');
 const sortBy = ref<OrderSortBy>(OrderSortBy.CREATED_AT);
 const notificationsEnabled = ref(true);
 const notificationSound = ref<HTMLAudioElement | null>(null);
-
 
 // Fetch orders with query parameters
 const { isLoading: isQueueGetLoading, execute: executeQueueOrders } = useAxios(
@@ -110,29 +112,36 @@ const fetchQueueOrders = async () => {
     await executeQueueOrders({ params: query });
 };
 
+// ===================================== Lifecycle
 onMounted(() => {
     // Fetch the Queue Orders (Initial fetch)
     fetchQueueOrders();
 
-    // Listen for real-time updates
-    if ($socket) {
-        $socket.on('orderUpdate', (update: any) => {
-            const index = orders.value.findIndex((o) => o.id === update.orderId);
-            if (index !== -1) {
-                orders.value[index] = { ...orders.value[index], ...update };
-            } else {
-                orders.value.push(update);
-            }
+    // Initialize socket connection and listeners
+    connectSocket();
+    joinRoom([UserRole.CHEF]);
 
-            // Play notification sound if enabled
-            if (notificationsEnabled.value && notificationSound.value) {
-                notificationSound.value.play();
-            }
-        });
-    }
+    // Listen for order updates
+    listenToEvent('orderUpdate', (update: OrderUpdateListened) => {
+        const index = orders.value.findIndex((o) => o.id === update.orderId);
+        if (index !== -1) {
+            // Update existing order
+            orders.value[index] = { ...orders.value[index], ...update };
+        } else {
+            // Add new order to the end of the queue
+            orders.value.push(update?.order);
+        }
+
+        console.log('Received order Updates:', update);
+
+        // Play notification sound if enabled
+        if (notificationsEnabled.value && notificationSound.value) {
+            notificationSound.value.play();
+        }
+    });
 });
 
-// Filtered and sorted orders
+// ===================================== Filtered and sorted orders
 const filteredOrders = computed(() => (status: string) => {
     return orders.value
         .filter((order) => order.status === status && (filterType.value === 'all' || order.type === filterType.value))
@@ -147,13 +156,27 @@ const filteredOrders = computed(() => (status: string) => {
 
 // Claim an order
 const claimOrder = async (orderId: string) => {
-    await useApi().chef.claimOrder(orderId);
+    await useAxios(ENDPOINTS.CHEF.CLAIM_ORDER(orderId), { method: 'PATCH' }, $api, {
+        initialData: null,
+        immediate: true,
+        onError(err) {
+            console.error('Failed to order Claim request:', err);
+            throw err;
+        }
+    })
     await fetchQueueOrders(); // Refresh the order list
 };
 
 // Complete an order
 const completeOrder = async (orderId: string) => {
-    await useApi().chef.completeOrder(orderId);
+    await useAxios(ENDPOINTS.CHEF.COMPLETE_ORDER(orderId), { method: 'PATCH' }, $api, {
+        initialData: null,
+        immediate: true,
+        onError(err) {
+            console.error('Failed to order Complete request:', err);
+            throw err;
+        }
+    })
     await fetchQueueOrders(); // Refresh the order list
 };
 

@@ -113,18 +113,33 @@ Check out the [deployment documentation](https://nuxt.com/docs/getting-started/d
 ### version 4
 
 1. [Enhanced (Chef) Page logic]
+2. [Enhanced (Cashier) Page logic]
+3. [Added new (Types) and (useSocketIo) composable]
+4. [Configured (Socket-Client)] with the env variables
+5. [Build (Admin Home) Page]
+   [Installed (Chart and Vue-Chart) Packages]
 
-## Modules Installed
+## Dependencies Installed
 
-### Core Nuxt Modules
-
--   vueuse (module)
--   pinia/nuxt (module)
--   axios (module)
--   auth/next (module > package)
+-   vueuse (Module)
+-   pinia/nuxt (Module)
+-   axios (Module)
+-   auth/next (Module > Package)
     . Purpose: Handles authentication and authorization.
     . Use Case: User login, logout, and role-based access control.
--   uuid (UUIDs handler)
+-   uuid (Package) {UUIDs handler}
+-   magic-regexp {Development Tools}
+-   eslint (Module) {Development Tools}
+    -   -D typescript (to make it more strict)
+-   image (Module) {Performance and Optimization}
+-   socket.io socket.io-client (Package) {Real-time Communication}
+    . Purpose: Enables real-time communication with the backend.
+    . Use Case: Real-time order updates, notifications, and IoT integration.
+    ```bash
+    npm install socket.io socket.io-client
+    npm install --save-dev @types/socket.io-client
+    ```
+-   chart & Vue-chart (Package) {Charts Creation}
 
 #### **Authentication Workflow**
 
@@ -168,30 +183,8 @@ Check out the [deployment documentation](https://nuxt.com/docs/getting-started/d
 -   **Role-Based Access**: Easily implement role-based access control.
 -   **OAuth Support**: Supports third-party authentication (e.g., Google, Facebook).
 
-### UI and Styling Modules
-
 -   tailwindcss (module)
     -   tailwindcss/vite (dependency)
-
-### Development Tools
-
--   magic-regexp
--   eslint (module)
-    -   -D typescript (to make it more strict)
-
-### Performance and Optimization
-
--   image (module)
-
-### Real-time Communication
-
--   socket.io socket.io-client (socket.io-client)
-    . Purpose: Enables real-time communication with the backend.
-    . Use Case: Real-time order updates, notifications, and IoT integration.
-    ```bash
-    npm install socket.io socket.io-client
-    npm install --save-dev @types/socket.io-client
-    ```
 
 ## VueUse Installed & Used
 

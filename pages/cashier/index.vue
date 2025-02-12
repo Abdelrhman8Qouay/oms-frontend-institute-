@@ -8,7 +8,7 @@
                     <div class="flex space-x-4">
                         <button v-for="type in Object.values(OrderTypes)" :key="type" :class="[
                             'px-4 py-2 rounded-md',
-                            orderType === OrderTypes.DINE_IN ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700',
+                            orderType === type ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700',
                         ]" @click="setOrderType(type)">
                             {{ formatReadableText(type) }}
                         </button>
@@ -128,7 +128,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import type { CustomerDetails, SelectedItem } from '~/utils/types/cashier.type';
-import { OrderTypes } from '~/utils/types/order.type';
+import { OrderStatus, OrderTypes } from '~/utils/types/order.type';
 import type { MenuObject, MenuItem, MenuCategory } from '~/utils/types/menu.type';
 import { fixedFraction, formatReadableText } from '~/utils/functions/format';
 import { useAxios } from '@vueuse/integrations/useAxios.mjs';
@@ -138,7 +138,6 @@ import type { AxiosInstance } from 'axios';
 const { $api } = useNuxtApp() as { $api: AxiosInstance } // Access Axios from plugin
 
 const menuStore = useMenuStore()
-const orderTypes = [...Object.values(OrderTypes)];
 
 // State
 const currentMenu = ref<MenuObject>({});
@@ -155,7 +154,8 @@ const showCustomerModal = ref<boolean>(false);
 
 // Computed
 const total = computed(() => {
-    return selectedItems.value.reduce((sum, item) => sum + item.totalPrice, 0);
+    const sum = selectedItems.value.reduce((sum, item) => sum + item.totalPrice, 0);
+    return parseFloat(fixedFraction(sum, 2)); // Ensure 2 decimal places and avoid floating-point precision issues
 });
 
 const isDelivery = computed(() => orderType.value === OrderTypes.DELIVERY);
@@ -217,7 +217,7 @@ function addItem(item: MenuItem) {
         selectedItems.value.push({
             ...item,
             quantity: 1,
-            totalPrice: item.price,
+            totalPrice: parseFloat(fixedFraction(item.price, 2)), // Ensure precision
         });
     }
 }
@@ -233,7 +233,7 @@ function updateItemQuantity(itemId: string, quantity: number) {
             removeItem(itemId);
         } else {
             item.quantity = quantity;
-            item.totalPrice = item.price * quantity;
+            item.totalPrice = parseFloat(fixedFraction(item.price * quantity, 2)); // Ensure precision
         }
     }
 }
@@ -279,10 +279,9 @@ async function submitOrder() {
                         name: item.name,
                         price: item.price,
                         quantity: item.quantity,
-                        totalPrice: item.totalPrice,
                     })),
                     customerDetails: customerDetails.value,
-                    totalPrice: total.value,
+                    status: OrderStatus.PENDING
                 }, method: 'POST'
             },
         );

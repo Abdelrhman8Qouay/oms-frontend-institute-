@@ -155,7 +155,9 @@ export default defineNuxtConfig({
     runtimeConfig: {
         public: {
             apiBaseUrl: process.env.API_BASE_URL || 'http://localhost:3000', // Public API URL
-            socketUrl: process.env.SOCKET_URL || 'http://localhost:3000', // Public Socket URL
+            socketUrl: process.env.SOCKET_URL || 'http://localhost:3001', // Public Socket URL
+            orderSocketUrl: process.env.SOCKET_ORDER_URL, // Public Socket URL
+            notificationSocketUrl: process.env.SOCKET_NOTIFICATION_URL, // Public Socket URL
             apiTimeout: process.env.API_TIMEOUT,
         },
     },
