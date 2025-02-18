@@ -119,6 +119,14 @@ Check out the [deployment documentation](https://nuxt.com/docs/getting-started/d
 5. [Build (Admin Home) Page]
    [Installed (Chart and Vue-Chart) Packages]
 
+### version 5
+
+1. [Added (Auth) pages]
+2. [Added & Enhanced the (middlewares)]
+3. [Built (Landing) page]
+4. [Updated (Pages) structure]
+5. [Created (Input) component] created advanced input instead of the manually setup
+
 ## Dependencies Installed
 
 -   vueuse (Module)

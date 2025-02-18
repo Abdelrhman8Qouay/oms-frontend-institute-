@@ -9,10 +9,16 @@ export enum UserRole {
 
 // Types for User Management
 export interface User {
-    id: string
-    name: string
+    id?: string
+    username: string
     email: string
+    isEmailVerified: boolean
+    emailVerificationToken?: string
+    password?: string
     role: UserRole
-    createdAt: Date
-    updatedAt: Date
+    isActive?: boolean
+    lastLogin?: Date | string
+    fullName?: string
+    createdAt: Date | string
+    updatedAt: Date | string
 }

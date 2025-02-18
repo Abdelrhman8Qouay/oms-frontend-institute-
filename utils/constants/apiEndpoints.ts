@@ -3,7 +3,9 @@ export const ENDPOINTS = {
         LOGIN: '/auth/login',
         REGISTER: '/auth/register',
         LOGOUT: '/auth/logout',
-        USER_PROFILE: '/auth/me',
+        // REFRESH_TOKEN: '/auth/refresh-token',
+        GET_USER: '/auth/me',
+        USER_PROFILE: '/auth/profile',
     },
     CASHIER: {
         CREATE_ORDER: '/cashier/orders',

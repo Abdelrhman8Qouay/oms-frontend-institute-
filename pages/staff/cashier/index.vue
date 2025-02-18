@@ -1,21 +1,21 @@
 <template>
     <div class="min-h-screen bg-gray-100">
         <!-- Header -->
-        <header class="bg-white shadow-sm">
+        <div class="bg-white shadow-sm">
             <div class="max-w-7xl mx-auto px-4 py-4">
                 <div class="flex justify-between items-center">
-                    <h1 class="text-2xl font-bold text-gray-900">Cashier Dashboard</h1>
+                    <h3 class=" text-gray-800 text-sm font-semibold">Menu is {{ currentMenu?.name }}</h3>
                     <div class="flex space-x-4">
                         <button v-for="type in Object.values(OrderTypes)" :key="type" :class="[
                             'px-4 py-2 rounded-md',
-                            orderType === type ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700',
+                            orderType === type ? 'bg-yellow-600 text-white' : 'bg-gray-200 text-gray-700',
                         ]" @click="setOrderType(type)">
                             {{ formatReadableText(type) }}
                         </button>
                     </div>
                 </div>
             </div>
-        </header>
+        </div>
 
         <!-- Main Content -->
         <main class="max-w-7xl mx-auto px-4 py-6">
@@ -32,12 +32,12 @@
                     <div v-else class="w-full">
                         <!-- Categories -->
                         <div class="bg-white p-4 rounded-lg shadow mb-6">
-                            <h2 class="text-lg font-semibold mb-4">Categories</h2>
+                            <h2 class="text-2xl font-bold text-gray-900">Categories</h2>
                             <div class="flex space-x-4 overflow-x-auto">
                                 <button v-for="category in currentMenu?.categories" :key="category.id" :class="[
                                     'px-4 py-2 rounded-md whitespace-nowrap',
                                     currentCategory?.id === category.id
-                                        ? 'bg-blue-600 text-white'
+                                        ? 'bg-yellow-600 text-white'
                                         : 'bg-gray-200 text-gray-700',
                                 ]" @click="selectCategory(category)">
                                     {{ category.name }}
@@ -53,8 +53,12 @@
                                     (cat) => cat.id === currentCategory?.id
                                 )?.items" :key="item.id" class="p-4 border rounded-lg cursor-pointer hover:bg-gray-50"
                                     @click="addItem(item)">
-                                    <h3 class="font-medium">{{ item.name }}</h3>
-                                    <p class="text-gray-600">${{ fixedFraction(item.price, 2) }}</p>
+                                    <h3 class="text-gray-700 text-base font-medium">{{ item.name }}</h3>
+                                    <div class="w-full h-max flex justify-between items-center">
+                                        <p class="text-green-600 text-sm font-extralight">${{ fixedFraction(item.price,
+                                            2) }}</p>
+                                        <Icon name="" />
+                                    </div>
                                     <p v-if="item.preparationTime" class="text-sm text-gray-500">
                                         Prep Time: {{ item.preparationTime }} mins
                                     </p>
@@ -106,7 +110,7 @@
 
                         <!-- Submit Button -->
                         <button type="button"
-                            class="w-full mt-4 px-4 py-2 bg-blue-600 text-white rounded-md disabled:bg-gray-400"
+                            class="w-full mt-4 px-4 py-2 bg-yellow-600 text-white rounded-md disabled:bg-gray-400"
                             :disabled="!canSubmitOrder" @click="submitOrder">
                             Submit Order
                         </button>

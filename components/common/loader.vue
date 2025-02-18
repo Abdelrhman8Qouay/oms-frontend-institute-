@@ -6,13 +6,12 @@
             'loader--item': !isFullScreen,
             'loader--prevent-interaction': preventInteraction,
         },
-    ]" :style="{
-        width: size,
-        height: size,
-    }">
+    ]">
         <div v-for="i in 3" :key="i" :class="['loader__dot', `loader__dot--${animationType}`]" :style="{
             backgroundColor: color,
             animationDelay: `${i * 0.2}s`,
+            width: size,
+            height: size,
         }"></div>
     </div>
 </template>
@@ -52,24 +51,15 @@ const loaderStyle = computed(() => ({
 }));
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 /* Base Loader Styles */
 .loader {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
+    @apply flex justify-center items-center relative;
 }
 
 /* Full Screen Loader */
 .loader--full {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 1000;
+    @apply fixed top-0 left-0 w-screen h-screen bg-black/45 z-[1500];
 }
 
 /* Prevent Interaction */
@@ -84,9 +74,7 @@ const loaderStyle = computed(() => ({
 
 /* Loader Dots */
 .loader__dot {
-    width: 20%;
-    height: 20%;
-    border-radius: 50%;
+    @apply w-[20%] h-[20%] rounded-full;
     margin: 0 5%;
     animation-duration: 1s;
     animation-iteration-count: infinite;
