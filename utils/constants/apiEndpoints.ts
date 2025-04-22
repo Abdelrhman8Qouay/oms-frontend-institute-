@@ -1,3 +1,5 @@
+import type { OrderStatus } from "../types/order.type"
+
 export const ENDPOINTS = {
     AUTH: {
         LOGIN: '/auth/login',
@@ -34,15 +36,24 @@ export const ENDPOINTS = {
         DELETE_MENU: (id: string) => `/admin/menus/${id}`,
         TOGGLE_AVAILABILITY: (id: string) => `/admin/menus/${id}/availability`,
     },
+    ADMIN_ORDERS: {
+        GET_ORDERS: '/admin/orders',
+        FIND_ORDER: (id: string) => `/admin/orders/${id}`,
+        UPDATE_ORDER: (id: string) => `/admin/orders/${id}`,
+        CANCEL_ORDER: (id: string) => `/admin/orders/${id}/cancel`,
+        OVERRIDE_ORDER: (id: string) => `/admin/orders/${id}/override`,
+        FORCE_ORDER_STATUS: (id: string, status: OrderStatus) => `/admin/orders/${id}/force-status/${status}`,
+        GET_ORDER_HISTORY: (id: string) => `/admin/orders/${id}/history`,
+    },
 } as const
 
 // Extract nested keys from ENDPOINTS
 type ExtractEndpointPaths<T, Prefix extends string = ''> = {
     [K in keyof T]: T[K] extends string
-        ? `${Prefix}${K & string}` // Base case: direct string endpoint
-        : T[K] extends (...args: any[]) => string
-        ? `${Prefix}${K & string}` // Base case: function endpoint
-        : ExtractEndpointPaths<T[K], `${Prefix}${K & string}.`> // Recursive case
+    ? `${Prefix}${K & string}` // Base case: direct string endpoint
+    : T[K] extends (...args: any[]) => string
+    ? `${Prefix}${K & string}` // Base case: function endpoint
+    : ExtractEndpointPaths<T[K], `${Prefix}${K & string}.`> // Recursive case
 }[keyof T]
 
 // Generate type for endpoint keys

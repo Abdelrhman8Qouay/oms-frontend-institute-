@@ -3,18 +3,22 @@
         <!-- Page Title -->
         <h1 class="text-2xl font-bold mb-6">📊 Dashboard</h1>
 
-        <!-- Key Metrics -->
-        <DashboardMetrics :stats="dashboardStats" :loading="isStatsLoading" />
+        <CommonLoader v-if="isStatsLoading" isFullScreen preventInteraction />
 
-        <!-- AI Insights -->
-        <DashboardAIInsights :insights="aiInsights" :loading="isAiInsightsLoading" />
+        <div v-else>
+            <!-- Key Metrics -->
+            <DashboardMetrics :stats="dashboardStats" :loading="isStatsLoading" />
 
-        <!-- Charts -->
-        <DashboardCharts :revenue="revenueAnalytics" :popularItems="popularItems"
-            :loading="isRevenueLoading || isPopularItemsLoading" />
+            <!-- AI Insights -->
+            <DashboardAIInsights :insights="aiInsights" :loading="isAiInsightsLoading" />
 
-        <!-- Menu Management -->
-        <DashboardMenuManagement />
+            <!-- Charts -->
+            <DashboardCharts :revenue="revenueAnalytics" :popularItems="popularItems"
+                :loading="isRevenueLoading || isPopularItemsLoading" />
+
+            <!-- Menu Management -->
+            <DashboardMenuManagement />
+        </div>
     </div>
 </template>
 

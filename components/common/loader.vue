@@ -7,17 +7,18 @@
             'loader--prevent-interaction': preventInteraction,
         },
     ]">
-        <div v-for="i in 3" :key="i" :class="['loader__dot', `loader__dot--${animationType}`]" :style="{
+        <!-- <div v-for="i in 3" :key="i" :class="['loader__dot', `loader__dot--${animationType}`]" :style="{
             backgroundColor: color,
             animationDelay: `${i * 0.2}s`,
             width: size,
             height: size,
-        }"></div>
+        }"></div> -->
+        <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
     </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+// import { computed } from 'vue';
 
 // Props
 const props = defineProps({
@@ -29,26 +30,26 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
-    size: {
-        type: String,
-        default: '50px',
-    },
-    color: {
-        type: String,
-        default: '#3498db',
-    },
-    animationType: {
-        type: String,
-        default: 'bounce',
-        validator: (value: string) => ['bounce', 'rotate', 'pulse', 'fade'].includes(value),
-    },
+    // size: {
+    //     type: String,
+    //     default: '50px',
+    // },
+    // color: {
+    //     type: String,
+    //     default: '#3498db',
+    // },
+    // animationType: {
+    //     type: String,
+    //     default: 'bounce',
+    //     validator: (value: string) => ['bounce', 'rotate', 'pulse', 'fade'].includes(value),
+    // },
 });
 
 // Computed
-const loaderStyle = computed(() => ({
-    width: props.size,
-    height: props.size,
-}));
+// const loaderStyle = computed(() => ({
+//     width: props.size,
+//     height: props.size,
+// }));
 </script>
 
 <style scoped lang="scss">
@@ -69,7 +70,7 @@ const loaderStyle = computed(() => ({
 
 /* Item Loader */
 .loader--item {
-    display: inline-block;
+    @apply flex w-full justify-center items-center h-64;
 }
 
 /* Loader Dots */

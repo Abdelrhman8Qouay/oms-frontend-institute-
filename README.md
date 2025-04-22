@@ -127,6 +127,22 @@ Check out the [deployment documentation](https://nuxt.com/docs/getting-started/d
 4. [Updated (Pages) structure]
 5. [Created (Input) component] created advanced input instead of the manually setup
 
+### version 6
+
+1. [Update (Dashboard) components]
+2. [Create (Show All Menus) Page] new page in the dashboard
+3. [Create (Collapsible) Menus]
+4. [Create (Dashboard Menu) Components]
+5. [Create (Edit, Create) Dashboard Menu Pages]
+
+### version 7
+
+1. [Update (Dashboard Home)]
+2. [Update (Data Types)]
+3. [Upgrade Structure]
+4. [Stopped (Auth)] stopped till end development
+5. [Created (Dashboard Orders) Pages]
+
 ## Dependencies Installed
 
 -   vueuse (Module)

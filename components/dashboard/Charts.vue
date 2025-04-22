@@ -44,7 +44,7 @@ const popularItemsChartData = computed(() => ({
 <template>
     <div class="bg-white p-4 rounded shadow mb-6">
         <h2 class="text-xl font-semibold mb-4">🔹 Charts</h2>
-        <CommonLoader v-if="loading" isFullScreen preventInteraction />
+        <CommonLoader v-if="loading" />
         <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <!-- Revenue Chart -->
             <div>

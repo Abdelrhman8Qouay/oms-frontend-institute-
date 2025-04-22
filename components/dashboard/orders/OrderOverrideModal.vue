@@ -1,0 +1,81 @@
+<template>
+    <div class="fixed inset-0 overflow-y-auto z-50">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+                <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+            </div>
+
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+            <div
+                class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+                <div>
+                    <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-yellow-100">
+                        <Icon name="warning" class="h-6 w-6 text-yellow-600" />
+                    </div>
+                    <h3 class="text-lg leading-6 font-medium text-gray-900 mt-3 mb-2">
+                        Override Order #{{ order.id.slice(0, 8) }}
+                    </h3>
+                    <p class="text-sm text-gray-500 mb-4">
+                        This action will bypass normal order validation rules. Please provide a reason for this
+                        override.
+                    </p>
+
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Override Reason</label>
+                        <textarea v-model="reason" rows="3" class="w-full rounded-md border-gray-300 shadow-sm"
+                            placeholder="Explain why this override is necessary..." required></textarea>
+                    </div>
+
+                    <div class="flex items-center">
+                        <input v-model="forceAction" type="checkbox" id="forceAction"
+                            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                        <label for="forceAction" class="ml-2 block text-sm text-gray-700">
+                            Force this action (bypass all validations)
+                        </label>
+                    </div>
+                </div>
+
+                <div class="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
+                    <button type="button" @click="submit" :disabled="!reason" :class="{
+                        'bg-yellow-600 hover:bg-yellow-700': !forceAction,
+                        'bg-orange-600 hover:bg-orange-700': forceAction,
+                        'opacity-50 cursor-not-allowed': !reason
+                    }"
+                        class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 text-base font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:col-start-2 sm:text-sm">
+                        {{ forceAction ? 'Force Override' : 'Override Order' }}
+                    </button>
+                    <button type="button" @click="$emit('close')"
+                        class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:col-start-1 sm:text-sm">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script setup lang="ts">
+import { ref } from 'vue'
+
+const props = defineProps({
+    order: {
+        type: Object,
+        required: true
+    }
+})
+
+const emit = defineEmits(['close', 'submit'])
+
+const reason = ref('')
+const forceAction = ref(false)
+
+const submit = () => {
+    if (!reason.value) return
+
+    emit('submit', {
+        reason: reason.value,
+        force: forceAction.value
+    })
+}
+</script>

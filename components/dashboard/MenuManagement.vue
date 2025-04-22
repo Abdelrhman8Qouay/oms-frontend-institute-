@@ -11,7 +11,7 @@ const isEditing = ref(false)
 const editedItem = ref<MenuItem | null>(null)
 
 // Fetch menu items
-const { isLoading: isMenuLoading, execute: fetchMenuItems } = useAxios(
+const { isLoading: loading, execute: fetchMenuItems } = useAxios(
     ENDPOINTS.ADMIN_MENUS.GET_MENUS,
     { method: 'GET' },
     $api,
@@ -66,7 +66,7 @@ onMounted(() => {
 <template>
     <div class="bg-white p-4 rounded shadow mb-6">
         <h2 class="text-xl font-semibold mb-4">🔹 Menu Management</h2>
-        <div v-if="isMenuLoading" class="text-center">Loading...</div>
+        <CommonLoader v-if="loading" />
         <div v-else>
             <!-- Edit Form (Conditional) -->
             <div v-if="isEditing" class="mb-4">
