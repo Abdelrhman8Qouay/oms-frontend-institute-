@@ -17,7 +17,7 @@ const toggle = () => {
         <button @click="toggle"
             class="flex items-center justify-between w-full p-3 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">
             <div class="flex items-center gap-2">
-                <Icon name="folder" class="text-gray-500" />
+                <Icon name="mdi-light:folder" class="text-gray-500" />
                 <span class="font-medium">{{ category.name }}</span>
                 <span class="text-xs text-gray-500 ml-2">({{ category.items?.length || 0 }} items)</span>
             </div>
@@ -28,7 +28,7 @@ const toggle = () => {
                 }">
                     {{ category.isActive ? 'Active' : 'Inactive' }}
                 </span>
-                <Icon name="chevron-down" class="transition-transform duration-200 text-gray-400"
+                <Icon name="mdi-light:chevron-down" class="transition-transform duration-200 text-gray-400"
                     :class="{ 'transform rotate-180': isOpen }" />
             </div>
         </button>

@@ -11,7 +11,7 @@
                 class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
                 <div>
                     <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
-                        Cancel Order #{{ order.id.slice(0, 8) }}
+                        Cancel Order {{ orderIdFormat(order.id) }}
                     </h3>
 
                     <div class="mb-4">
@@ -34,7 +34,8 @@
                         'bg-red-600 hover:bg-red-700': !issueRefund,
                         'bg-purple-600 hover:bg-purple-700': issueRefund,
                         'opacity-50 cursor-not-allowed': !reason
-                    }" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 text-base font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:col-start-2 sm:text-sm">
+                    }"
+                        class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 text-base font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:col-start-2 sm:text-sm">
                         {{ issueRefund ? 'Cancel & Refund' : 'Cancel Order' }}
                     </button>
                     <button type="button" @click="$emit('close')"
@@ -49,6 +50,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { orderIdFormat } from '~/utils/functions/format'
 
 const props = defineProps({
     order: {

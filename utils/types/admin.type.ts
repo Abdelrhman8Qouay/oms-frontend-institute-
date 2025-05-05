@@ -1,25 +1,15 @@
 import type { OrderItemObject, OrderObject, OrderTypes } from './order.type'
-import type { UserRole } from './user.type'
 
-export enum AIInsightTypes {
-    WARNING = 'warning',
-    INFO = 'info',
-    SUCCESS = 'success',
-    ERROR = 'error',
-}
 
-export interface DashboardStatsDto {
+interface RevenueDataPointDto {
+    date: string
+    orders: number
     revenue: number
-    ordersToday: number
-    popularItem: string
-    totalOrders: number
-    averageOrderValue: number
-    totalItems: number
 }
 
 export interface RevenueAnalyticsDto {
+    data: RevenueDataPointDto[] // e.g., [100, 200, 150]
     labels: string[] // e.g., ['Mon', 'Tue', 'Wed']
-    data: number[] // e.g., [100, 200, 150]
     summary: {
         totalRevenue: number
         averageDaily: number
@@ -28,9 +18,13 @@ export interface RevenueAnalyticsDto {
 }
 
 export interface PopularItemDto {
-    name: string
-    quantity: number
-    category: string
+    menuItemId: string,
+    name: string,
+    category: string,
+    totalQuantity: number,
+    totalRevenue: number,
+    averagePrice: number,
+    lastSoldAt: string | Date,
     isAvailable: boolean
 }
 
@@ -71,21 +65,6 @@ export type OrderItemSchema = OrderItemObject & {
     _id: string
 }
 
-// Types for AI Insights
-export interface AIInsight {
-    id: string
-    message: string
-    type: AIInsightTypes
-    createdAt: Date
-}
-
-// Types for Admin Dashboard
-export interface AdminDashboardData {
-    stats: DashboardStatsDto
-    revenue: RevenueAnalyticsDto
-    popularItems: PopularItemDto[]
-    aiInsights: AIInsight[]
-}
 
 // Types for Order Analytics
 export interface OrderAnalytics {

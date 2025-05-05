@@ -22,10 +22,9 @@ const toggle = () => {
 
 <template>
     <div>
-        <button @click="toggle"
-            class="flex items-center justify-between w-full p-2 text-gray-700 hover:bg-gray-100 rounded transition-colors">
+        <button @click="toggle" class="flex items-center justify-between w-full p-2 rounded transition-colors">
             <div class="flex items-center">
-                <span v-if="icon" class="mr-2">{{ icon }}</span>
+                <Icon v-if="icon" :name="icon" class="mr-2" />
                 <span>{{ title }}</span>
             </div>
             <Icon name="chevron-down" class="transition-transform duration-200" :class="{ 'rotate-180': isOpen }" />

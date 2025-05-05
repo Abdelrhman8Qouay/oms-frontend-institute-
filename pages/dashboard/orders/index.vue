@@ -72,7 +72,7 @@
         </div>
 
         <!-- Orders Table -->
-        <div v-else class="bg-white rounded-lg shadow overflow-hidden">
+        <div v-else class="bg-white rounded-lg shadow">
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
@@ -110,10 +110,10 @@
                     <tbody class="bg-white divide-y divide-gray-200">
                         <tr v-for="order in orders" :key="order.id" class="hover:bg-gray-50">
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                #{{ order.id.slice(0, 8) }}
+                                {{ orderIdFormat(order.id) }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {{ order.customerName || 'Guest' }}
+                                {{ order.customer?.username || 'Guest' }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                 <span :class="typeBadgeClass(order.type)">
@@ -126,7 +126,7 @@
                                 </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                ${{ order.totalAmount?.toFixed(2) || '0.00' }}
+                                ${{ fixedFraction(order.totalPrice, 2) || '0.00' }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                 {{ formatDate(order.createdAt) }}
@@ -136,7 +136,14 @@
                                     class="text-blue-600 hover:text-blue-900 mr-3">
                                     View
                                 </NuxtLink>
-                                <DashboardOrdersOrderActionsDropdown :order="order" @update="handleOrderAction" />
+                                <CommonDropdown title="Actions" icon="mdi:chevron-down">
+                                    <button
+                                        v-for="([btn, action], index) in [['Update Status', 'update'], ['Cancel Order', 'cancel'], ['Override', 'override'], ['View History', 'history']]"
+                                        :key="index" @click.prevent="handleOrderAction(action, order)"
+                                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
+                                        {{ btn }}
+                                    </button>
+                                </CommonDropdown>
                             </td>
                         </tr>
                     </tbody>
@@ -144,47 +151,8 @@
             </div>
 
             <!-- Pagination -->
-            <div class="px-6 py-3 flex items-center justify-between border-t border-gray-200">
-                <div class="flex-1 flex justify-between sm:hidden">
-                    <button :disabled="currentPage === 1" @click="prevPage"
-                        class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                        Previous
-                    </button>
-                    <button :disabled="currentPage >= totalPages" @click="nextPage"
-                        class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                        Next
-                    </button>
-                </div>
-                <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-                    <div>
-                        <p class="text-sm text-gray-700">
-                            Showing <span class="font-medium">{{ (currentPage - 1) * pageSize + 1 }}</span>
-                            to <span class="font-medium">{{ Math.min(currentPage * pageSize, totalItems) }}</span>
-                            of <span class="font-medium">{{ totalItems }}</span> results
-                        </p>
-                    </div>
-                    <div>
-                        <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
-                            <button :disabled="currentPage === 1" @click="prevPage"
-                                class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
-                                <span class="sr-only">Previous</span>
-                                <Icon name="mdi:chevron-left" class="h-5 w-5" />
-                            </button>
-                            <button v-for="page in visiblePages" :key="page" @click="currentPage = page" :class="{
-                                'z-10 bg-blue-50 border-blue-500 text-blue-600': page === currentPage,
-                                'bg-white border-gray-300 text-gray-500 hover:bg-gray-50': page !== currentPage
-                            }" class="relative inline-flex items-center px-4 py-2 border text-sm font-medium">
-                                {{ page }}
-                            </button>
-                            <button :disabled="currentPage >= totalPages" @click="nextPage"
-                                class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
-                                <span class="sr-only">Next</span>
-                                <Icon name="mdi:chevron-right" class="h-5 w-5" />
-                            </button>
-                        </nav>
-                    </div>
-                </div>
-            </div>
+            <CommonPagination :total-items="totalItems" :page-size="pageSize" v-model="currentPage"
+                @page-change="fetchOrders()" @per-change="(pageSize) => handlePerPageChange(pageSize)" />
         </div>
 
         <!-- Order Action Modals -->
@@ -198,8 +166,10 @@
 </template>
 
 <script setup lang="ts">
-import { OrderStatus, OrderTypes } from '~/utils/types/order.type'
+import { OrderStatus, OrderTypes, type OrderObject } from '~/utils/types/order.type'
 import { ENDPOINTS } from '~/utils/constants/apiEndpoints'
+import { fixedFraction, formatDate, orderIdFormat } from '~/utils/functions/format'
+import { formatStatus, formatType, statusBadgeClass, typeBadgeClass } from '~/utils/functions/orders'
 
 definePageMeta({
     layout: 'admin',
@@ -224,10 +194,14 @@ const filters = reactive({
 const currentPage = ref(1)
 const pageSize = ref(10)
 const totalItems = ref(0)
-const totalPages = computed(() => Math.ceil(totalItems.value / pageSize.value))
+
+const handlePerPageChange = (size: number) => {
+    pageSize.value = size
+    fetchOrders()
+}
 
 // Data
-const orders = ref<any[]>([])
+const orders = ref<OrderObject[]>([])
 // const stats = ref<any>(null)
 // const isStatsLoading = ref(false)
 const isLoading = ref(false)
@@ -239,49 +213,6 @@ const showCancelModal = ref(false)
 const showOverrideModal = ref(false)
 const selectedOrder = ref<any>(null)
 
-// Formatting functions
-const formatStatus = (status: OrderStatus) => {
-    return status.split('_').map(word =>
-        word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-    ).join(' ')
-}
-
-const formatType = (type: OrderTypes) => {
-    return type.charAt(0).toUpperCase() + type.slice(1).toLowerCase()
-}
-
-const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString()
-}
-
-// Badge classes
-const statusBadgeClass = (status: OrderStatus) => {
-    const base = 'px-2 inline-flex text-xs leading-5 font-semibold rounded-full'
-    switch (status) {
-        case OrderStatus.COMPLETED:
-            return `${base} bg-green-100 text-green-800`
-        case OrderStatus.CANCELED:
-            return `${base} bg-red-100 text-red-800`
-        case OrderStatus.PENDING:
-            return `${base} bg-yellow-100 text-yellow-800`
-        default:
-            return `${base} bg-blue-100 text-blue-800`
-    }
-}
-
-const typeBadgeClass = (type: OrderTypes) => {
-    const base = 'px-2 inline-flex text-xs leading-5 font-semibold rounded-full'
-    switch (type) {
-        case OrderTypes.DELIVERY:
-            return `${base} bg-purple-100 text-purple-800`
-        case OrderTypes.DINE_IN:
-            return `${base} bg-indigo-100 text-indigo-800`
-        case OrderTypes.TAKEAWAY:
-            return `${base} bg-red-100 text-indigo-800`
-        default:
-            return `${base} bg-gray-100 text-gray-800`
-    }
-}
 
 // Fetch orders
 const fetchOrders = async () => {
@@ -304,13 +235,12 @@ const fetchOrders = async () => {
 
         const response = await $api.get(ENDPOINTS.ADMIN_ORDERS.GET_ORDERS, { params })
         orders.value = response.data.data
-        totalItems.value = response.headers['x-total-count'] || response.data.length
+        totalItems.value = response.data.meta.total
     } catch (err) {
         error.value = err
         console.error('Failed to fetch orders:', err)
     } finally {
         isLoading.value = false
-        console.log(orders.value)
     }
 }
 
@@ -334,30 +264,6 @@ const applyFilters = () => {
     // fetchStatistics()
 }
 
-// Pagination controls
-const prevPage = () => {
-    if (currentPage.value > 1) {
-        currentPage.value--
-    }
-}
-
-const nextPage = () => {
-    if (currentPage.value < totalPages.value) {
-        currentPage.value++
-    }
-}
-
-const visiblePages = computed(() => {
-    const maxVisible = 5
-    let start = Math.max(1, currentPage.value - Math.floor(maxVisible / 2))
-    let end = Math.min(totalPages.value, start + maxVisible - 1)
-
-    if (end - start + 1 < maxVisible) {
-        start = Math.max(1, end - maxVisible + 1)
-    }
-
-    return Array.from({ length: end - start + 1 }, (_, i) => start + i)
-})
 
 // Order actions
 const handleOrderAction = (action: string, order: any) => {

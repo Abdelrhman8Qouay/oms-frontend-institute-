@@ -9,7 +9,7 @@
                 </NuxtLink>
                 <div class="flex items-center mt-2">
                     <h1 class="text-2xl font-bold mr-3">
-                        Order #{{ order.id.slice(0, 8) }}
+                        Order #{{ order.id }}
                     </h1>
                     <LazyDashboardOrdersOrderStatusBadge :status="order.status" show-icon />
                 </div>
@@ -50,13 +50,13 @@
                         <h3 class="text-sm font-medium text-gray-500 mb-2">Customer</h3>
                         <div v-if="order.customer">
                             <p class="text-sm">{{ order.customer.username }}</p>
-                            <p class="text-sm text-gray-500">{{ order.customerDetails.phone }}</p>
+                            <p class="text-sm text-gray-500">{{ order.customerDetails?.phone }}</p>
                         </div>
                         <div v-else-if="order.customerDetails.name">
                             <p class="text-sm">{{ order.customerDetails.name }}</p>
-                            <p class="text-sm text-gray-500">{{ order.customerDetails.phone }}</p>
+                            <p class="text-sm text-gray-500">{{ order.customerDetails?.phone }}</p>
                         </div>
-                        <p v-else class="text-sm text-gray-500">Guest customer</p>
+                        <p v-else class="text-sm text-gray-500">Guest</p>
                     </div>
                     <!-- <div v-if="order.type === 'dine_in' && order.tableNumber">
                         <h3 class="text-sm font-medium text-gray-500 mb-2">Table Number</h3>
@@ -70,6 +70,11 @@
                                 order.deliveryAddress.zipCode }}
                         </p>
                     </div> -->
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500 mb-2">Daily Queue Number</h3>
+                        <p class="text-sm">{{ order.dailyQueueNumber }} <span
+                                class="text-[11px] text-gray-500">of</span> Day {{ formatDate(order.createdAt) }}</p>
+                    </div>
                     <div>
                         <h3 class="text-sm font-medium text-gray-500 mb-2">Total Items</h3>
                         <p class="text-sm">{{ order.itemsCount }}</p>
@@ -201,6 +206,7 @@
 <script setup lang="ts">
 import { OrderActionType, OrderStatus, OrderTypes, type OrderObject } from '~/utils/types/order.type'
 import { ENDPOINTS } from '~/utils/constants/apiEndpoints'
+import { formatDate, formatDateTime } from '~/utils/functions/format'
 
 definePageMeta({
     layout: 'admin',
@@ -217,6 +223,7 @@ const order = ref<OrderObject>({
     status: OrderStatus.PENDING,
     type: OrderTypes.DINE_IN,
     totalPrice: 0,
+    dailyQueueNumber: 0,
     itemsCount: 0,
     customerDetails: {
         name: '',
@@ -234,16 +241,6 @@ const error = ref<any>(null)
 const showStatusModal = ref(false)
 const showCancelModal = ref(false)
 const showOverrideModal = ref(false)
-
-// Formatting functions
-const formatDateTime = (dateString: string) => {
-    return new Date(dateString).toLocaleString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-    })
-}
 
 // Fetch order data
 const fetchOrder = async () => {

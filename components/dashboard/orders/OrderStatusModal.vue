@@ -46,6 +46,7 @@
 </template>
 
 <script setup lang="ts">
+import { formatStatus } from '~/utils/functions/orders'
 import { OrderStatus } from '~/utils/types/order.type'
 
 const orderStatuses = Object.values(OrderStatus)
@@ -62,11 +63,6 @@ const emit = defineEmits(['close', 'submit'])
 const status = ref(props.order.status)
 const notes = ref(props.order.adminNotes || '')
 
-const formatStatus = (status: OrderStatus) => {
-    return status.split('_').map(word =>
-        word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-    ).join(' ')
-}
 
 const submit = () => {
     emit('submit', {

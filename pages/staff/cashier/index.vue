@@ -4,7 +4,10 @@
         <div class="bg-white shadow-sm">
             <div class="max-w-7xl mx-auto px-4 py-4">
                 <div class="flex justify-between items-center">
-                    <h3 class=" text-gray-800 text-sm font-semibold">Menu is {{ currentMenu?.name }}</h3>
+                    <div
+                        class="border border-gray-300 bg-gray-300/30 rounded-sm text-gray-600 text-sm font-semibold px-1 py-[1px]">
+                        {{
+                            currentMenu?.name }}</div>
                     <div class="flex space-x-4">
                         <button v-for="type in Object.values(OrderTypes)" :key="type" :class="[
                             'px-4 py-2 rounded-md',
@@ -31,18 +34,21 @@
                     </div>
                     <div v-else class="w-full">
                         <!-- Categories -->
-                        <div class="bg-white p-4 rounded-lg shadow mb-6">
+                        <div class="w-full flex items-center gap-4 bg-white p-4 rounded-lg shadow mb-6">
                             <h2 class="text-2xl font-bold text-gray-900">Categories</h2>
-                            <div class="flex space-x-4 overflow-x-auto">
-                                <button v-for="category in currentMenu?.categories" :key="category.id" :class="[
-                                    'px-4 py-2 rounded-md whitespace-nowrap',
+                            <span>of</span>
+                            <CommonDropdown :title="(currentCategory.name as string)" icon="line-md:chevron-small-down">
+                                <li v-for="category in currentMenu?.categories" :key="category.id" :class="[
+                                    'px-2 py-1 rounded-md whitespace-nowrap flex items-center justify-between cursor-pointer',
                                     currentCategory?.id === category.id
                                         ? 'bg-yellow-600 text-white'
                                         : 'bg-gray-200 text-gray-700',
                                 ]" @click="selectCategory(category)">
-                                    {{ category.name }}
-                                </button>
-                            </div>
+                                    <span>{{ category.name }}</span>
+                                    <Icon v-show="currentCategory?.id === category.id"
+                                        name="line-md:cookie-check-twotone" class="text-green-200" />
+                                </li>
+                            </CommonDropdown>
                         </div>
 
                         <!-- Items -->
@@ -54,14 +60,18 @@
                                 )?.items" :key="item.id" class="p-4 border rounded-lg cursor-pointer hover:bg-gray-50"
                                     @click="addItem(item)">
                                     <h3 class="text-gray-700 text-base font-medium">{{ item.name }}</h3>
-                                    <div class="w-full h-max flex justify-between items-center">
+                                    <div class="w-full h-max flex gap-2 items-center">
                                         <p class="text-green-600 text-sm font-extralight">${{ fixedFraction(item.price,
                                             2) }}</p>
-                                        <Icon name="" />
+                                        <Icon name="material-symbols-light:shoppingmode-outline" />
                                     </div>
-                                    <p v-if="item.preparationTime" class="text-sm text-gray-500">
-                                        Prep Time: {{ item.preparationTime }} mins
-                                    </p>
+                                    <div class="w-full flex items-center justify-between">
+                                        <p v-if="item.preparationTime" class="text-sm text-gray-500">
+                                            Prep Time: {{ item.preparationTime }} mins
+                                        </p>
+                                        <Icon name="material-symbols-light:shopping-basket" size="23" mode="svg"
+                                            class="bg-gray-400/40 p-1 rounded-full fill-black" />
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -141,6 +151,10 @@ import type { AxiosInstance } from 'axios';
 
 const { $api } = useNuxtApp() as { $api: AxiosInstance } // Access Axios from plugin
 
+definePageMeta({
+    layout: 'cashier',
+})
+
 const menuStore = useMenuStore()
 
 // State
@@ -185,8 +199,8 @@ const { isLoading: isMenuLoading, execute: executeCurrentMenu } = useAxios(ENDPO
 
         // Update the current menu and cache
         currentMenu.value = data as MenuObject
-        menuStore.menuCache.cashier.set(currentMenu.value as MenuObject)
-        menuStore.menuIdCache.cashier.set(currentMenu.value.id as string)
+        // menuStore.menuCache.cashier.set(currentMenu.value as MenuObject)
+        // menuStore.menuIdCache.cashier.set(currentMenu.value.id as string)
 
         // Select the first category by default
         if (currentMenu.value.categories?.length) {
@@ -197,11 +211,11 @@ const { isLoading: isMenuLoading, execute: executeCurrentMenu } = useAxios(ENDPO
 
 async function fetchCurrentMenu() {
     // Get cached menu if exists
-    const cachedData = menuStore.menuCache.cashier.get();
-    if (Object.keys(cachedData).length !== 0) {
-        currentMenu.value = cachedData;
-        return;
-    }
+    // const cachedData = menuStore.menuCache.cashier.get();
+    // if (Object.keys(cachedData).length !== 0) {
+    //     currentMenu.value = cachedData;
+    //     return;
+    // }
 
     // Get menu by menu_id if exists
     currentMenuId.value = menuStore.menuIdCache.cashier.get();

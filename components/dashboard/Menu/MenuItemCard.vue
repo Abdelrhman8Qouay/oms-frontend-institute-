@@ -38,7 +38,7 @@ const toggleAvailability = async () => {
                 {{ isAvailable ? 'Available' : 'Unavailable' }}
             </button>
             <button class="p-1 text-gray-500 hover:text-gray-700">
-                <Icon name="pencil" class="w-4 h-4" />
+                <Icon name="mdi-light:pencil" class="w-4 h-4" />
             </button>
         </div>
     </div>

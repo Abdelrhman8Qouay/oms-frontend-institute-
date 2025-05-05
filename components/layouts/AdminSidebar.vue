@@ -1,44 +1,48 @@
 <template>
-    <aside class="w-64 bg-white shadow-md">
-        <nav class="p-4">
-            <ul class="space-y-2">
+    <aside class="bg-gray-900 shadow-md">
+        <nav class="p-6">
+            <!-- Logo -->
+            <div class="text-2xl mb-10 font-bold text-blue-600 flex flex-col justify-center items-center">
+                <span>🍔</span> <span>Restaurant Admin</span>
+            </div>
+
+            <!-- Sidebar Menu -->
+            <ul class="space-y-2 text-white">
                 <li>
-                    <NuxtLink :to="link_map.head" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded">
-                        📊 Dashboard
+                    <NuxtLink :to="link_map.head" class="itemA">
+                        <Icon name="mdi:view-dashboard-outline" class="mr-2" /> Dashboard
                     </NuxtLink>
                 </li>
 
-                <CommonCollapsibleMenu title="Menu Management" icon="🍽️" :defaultOpen="false">
+                <CommonCollapsibleMenu title="Menu Management" icon="mdi:format-list-bulleted-square"
+                    class="hover:bg-gray-200/20 rounded text-base" :defaultOpen="false">
                     <li>
-                        <NuxtLink :to="link_map.menu(false)"
-                            class="flex items-center p-2 text-gray-600 hover:bg-gray-100 rounded text-sm">
+                        <NuxtLink :to="link_map.menu(false)" class="itemB">
                             Show All
                         </NuxtLink>
                     </li>
                     <li>
-                        <NuxtLink :to="link_map.menu(true)"
-                            class="flex items-center p-2 text-gray-600 hover:bg-gray-100 rounded text-sm">
+                        <NuxtLink :to="link_map.menu(true)" class="itemB">
                             Create One
                         </NuxtLink>
                     </li>
                 </CommonCollapsibleMenu>
 
                 <li>
-                    <NuxtLink :to="link_map.orders(false)"
-                        class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded">
-                        🛒 Orders
+                    <NuxtLink :to="link_map.orders(false)" class="itemA">
+                        <Icon name="mdi:clipboard-text-search-outline" class="mr-2" /> Orders
                     </NuxtLink>
                 </li>
-                <li>
-                    <NuxtLink to="/reports" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded">
+                <!-- <li>
+                    <NuxtLink to="/reports" class="itemA">
                         📈 Reports
                     </NuxtLink>
                 </li>
                 <li>
-                    <NuxtLink to="/settings" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded">
+                    <NuxtLink to="/settings" class="itemA">
                         ⚙️ Settings
                     </NuxtLink>
-                </li>
+                </li> -->
             </ul>
         </nav>
     </aside>
@@ -53,3 +57,12 @@ const link_map = {
 }
 
 </script>
+<style lang="scss">
+.itemA {
+    @apply flex items-center p-2 hover:bg-gray-200/20 rounded text-base;
+}
+
+.itemB {
+    @apply flex items-center p-2 hover:bg-gray-200/20 rounded text-sm;
+}
+</style>

@@ -9,7 +9,7 @@
                 </NuxtLink>
                 <div class="flex items-center mt-2">
                     <h1 class="text-2xl font-bold mr-3">
-                        Order #{{ orderId.slice(0, 8) }} History
+                        Order {{ orderIdFormat(orderId) }} History
                     </h1>
                     <OrderStatusBadge :status="currentStatus" show-icon />
                 </div>
@@ -106,6 +106,8 @@
 <script setup lang="ts">
 import type { OrderHistoryResponse, OrderActionType } from '~/utils/types/order.type'
 import { ENDPOINTS } from '~/utils/constants/apiEndpoints'
+import { formatDateTime, orderIdFormat } from '~/utils/functions/format'
+import { eventIcon, formatAction } from '~/utils/functions/orders'
 
 definePageMeta({
     layout: 'admin',
@@ -121,43 +123,6 @@ const lastAction = ref<OrderHistoryResponse['lastAdminAction'] | null>(null)
 const isLoading = ref(false)
 const error = ref<any>(null)
 
-// Formatting functions
-const formatDateTime = (dateString: string) => {
-    return new Date(dateString).toLocaleString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-    })
-}
-
-const formatAction = (action: OrderActionType) => {
-    const actionMap = {
-        created: 'Order created',
-        updated: 'Order updated',
-        status_changed: 'Status changed',
-        cancelled: 'Order cancelled',
-        overridden: 'Order overridden',
-        force_changed: 'Status forced',
-        note_added: 'Note added',
-        payment_processed: 'Payment processed'
-    }
-    return actionMap[action] || action.replace('_', ' ')
-}
-
-const eventIcon = (action: OrderActionType) => {
-    const icons = {
-        created: { icon: 'plus', bg: 'bg-green-500' },
-        updated: { icon: 'edit', bg: 'bg-blue-500' },
-        status_changed: { icon: 'refresh', bg: 'bg-purple-500' },
-        cancelled: { icon: 'x', bg: 'bg-red-500' },
-        overridden: { icon: 'alert-circle', bg: 'bg-yellow-500' },
-        force_changed: { icon: 'alert-triangle', bg: 'bg-orange-500' },
-        note_added: { icon: 'file-text', bg: 'bg-indigo-500' },
-        payment_processed: { icon: 'credit-card', bg: 'bg-teal-500' }
-    }
-    return icons[action] || { icon: 'info', bg: 'bg-gray-500' }
-}
 
 // Fetch order history
 const fetchHistory = async () => {

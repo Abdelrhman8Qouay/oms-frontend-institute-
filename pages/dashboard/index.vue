@@ -3,22 +3,20 @@
         <!-- Page Title -->
         <h1 class="text-2xl font-bold mb-6">📊 Dashboard</h1>
 
-        <CommonLoader v-if="isStatsLoading" isFullScreen preventInteraction />
+        <!-- <CommonLoader v-if="isStatsLoading" isFullScreen preventInteraction /> -->
 
-        <div v-else>
-            <!-- Key Metrics -->
-            <DashboardMetrics :stats="dashboardStats" :loading="isStatsLoading" />
+        <!-- Key Metrics -->
+        <DashboardMetrics />
 
-            <!-- AI Insights -->
-            <DashboardAIInsights :insights="aiInsights" :loading="isAiInsightsLoading" />
+        <!-- AI Insights -->
+        <DashboardAIInsights :data="aiInsights" :loading="isAiInsightsLoading" />
 
-            <!-- Charts -->
-            <DashboardCharts :revenue="revenueAnalytics" :popularItems="popularItems"
-                :loading="isRevenueLoading || isPopularItemsLoading" />
+        <!-- Charts -->
+        <DashboardCharts :revenue="revenueData" :popularItems="popularItemsData"
+            :loading="isRevenueLoading || isPopularItemsLoading" />
 
-            <!-- Menu Management -->
-            <DashboardMenuManagement />
-        </div>
+        <!-- Menu Management -->
+        <DashboardMenuManagement />
     </div>
 </template>
 
@@ -26,7 +24,7 @@
 import { ref, onMounted } from 'vue'
 import { useAxios } from '@vueuse/integrations/useAxios'
 import { ENDPOINTS } from '~/utils/constants/apiEndpoints'
-import type { DashboardStatsDto, PopularItemDto, RevenueAnalyticsDto, AIInsight } from '~/utils/types/admin.type'
+import type { PopularItemDto, RevenueAnalyticsDto } from '~/utils/types/admin.type'
 
 definePageMeta({
     layout: 'admin',
@@ -35,28 +33,9 @@ definePageMeta({
 const { $api } = useNuxtApp()
 
 // Reactive state for dashboard data
-const dashboardStats = ref<DashboardStatsDto | null>(null)
-const revenueAnalytics = ref<RevenueAnalyticsDto | null>(null)
-const popularItems = ref<PopularItemDto[]>([])
-const aiInsights = ref<AIInsight[]>([])
-
-// Fetch dashboard stats
-const { isLoading: isStatsLoading, execute: fetchStats } = useAxios(
-    ENDPOINTS.ADMIN_DASHBOARD.GET_STATS,
-    { method: 'GET' },
-    $api,
-    {
-        initialData: null,
-        immediate: false,
-        onSuccess(data) {
-            dashboardStats.value = data
-            console.log('Fetched stats: ', data)
-        },
-        onError(err) {
-            console.error('Failed to fetch dashboard stats:', err)
-        },
-    }
-)
+const revenueData = ref<RevenueAnalyticsDto | null>(null)
+const popularItemsData = ref<PopularItemDto[]>([])
+const aiInsights = ref<any>(null)
 
 // Fetch revenue analytics
 const { isLoading: isRevenueLoading, execute: fetchRevenue } = useAxios(
@@ -67,7 +46,7 @@ const { isLoading: isRevenueLoading, execute: fetchRevenue } = useAxios(
         initialData: null,
         immediate: false,
         onSuccess(data) {
-            revenueAnalytics.value = data
+            revenueData.value = data
             console.log('Fetched revenue: ', data)
         },
         onError(err) {
@@ -85,7 +64,7 @@ const { isLoading: isPopularItemsLoading, execute: fetchPopularItems } = useAxio
         initialData: [],
         immediate: false,
         onSuccess(data) {
-            popularItems.value = data
+            popularItemsData.value = data
             console.log('Fetched popular: ', data)
         },
         onError(err) {
@@ -103,7 +82,7 @@ const { isLoading: isAiInsightsLoading, execute: fetchAiInsights } = useAxios(
         initialData: [],
         immediate: false,
         onSuccess(data) {
-            aiInsights.value = data.insights
+            aiInsights.value = data
             console.log('Fetched ai insights: ', data)
         },
         onError(err) {
@@ -114,7 +93,6 @@ const { isLoading: isAiInsightsLoading, execute: fetchAiInsights } = useAxios(
 
 // Fetch all data on page load
 onMounted(() => {
-    fetchStats()
     fetchRevenue()
     fetchPopularItems()
     fetchAiInsights()

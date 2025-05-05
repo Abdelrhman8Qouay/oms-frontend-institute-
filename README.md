@@ -141,7 +141,10 @@ Check out the [deployment documentation](https://nuxt.com/docs/getting-started/d
 2. [Update (Data Types)]
 3. [Upgrade Structure]
 4. [Stopped (Auth)] stopped till end development
-5. [Created (Dashboard Orders) Pages]
+5. [Created (Orders) Dashboard Pages]
+6. [Created (Order Tracking) Cashier Pages]
+7. [Update (User role)]
+8. [Update (Page Layouts)] some of changes for the layout of all pages to get something specific as needed
 
 ## Dependencies Installed
 

@@ -10,6 +10,8 @@ const isOpen = ref(props.defaultOpen || false)
 const toggle = () => {
     isOpen.value = !isOpen.value
 }
+
+defineEmits(['toggle-activation'])
 </script>
 
 <template>
@@ -17,18 +19,19 @@ const toggle = () => {
         <button @click="toggle"
             class="flex items-center justify-between w-full p-4 text-gray-800 hover:bg-gray-50 transition-colors">
             <div class="flex items-center gap-3">
-                <Icon name="menu" class="text-gray-500" />
+                <Icon name="ic:twotone-view-list" class="text-gray-500" />
                 <span class="font-medium">{{ menu.name }}</span>
                 <span v-if="menu.description" class="text-sm text-gray-500 ml-2">{{ menu.description }}</span>
             </div>
             <div class="flex items-center gap-2">
-                <span class="px-2 py-1 text-xs rounded-full" :class="{
-                    'bg-green-100 text-green-800': menu.isActive,
-                    'bg-gray-100 text-gray-800': !menu.isActive
-                }">
+                <button type='button' :disabled="menu.isActive" @click.prevent="$emit('toggle-activation', menu.id)"
+                    class="px-2 py-1 text-xs rounded-full cursor-pointer opacity-60 hover:opacity-100" :class="{
+                        'bg-green-100 text-green-800': menu.isActive,
+                        'bg-gray-100 text-gray-800': !menu.isActive
+                    }">
                     {{ menu.isActive ? 'Active' : 'Inactive' }}
-                </span>
-                <Icon name="chevron-down" class="transition-transform duration-200 text-gray-400"
+                </button>
+                <Icon name="mdi-light:chevron-down" class="transition-transform duration-200 text-gray-400"
                     :class="{ 'transform rotate-180': isOpen }" />
             </div>
         </button>

@@ -14,7 +14,7 @@
                         <Icon name="warning" class="h-6 w-6 text-yellow-600" />
                     </div>
                     <h3 class="text-lg leading-6 font-medium text-gray-900 mt-3 mb-2">
-                        Override Order #{{ order.id.slice(0, 8) }}
+                        Override Order {{ orderIdFormat(order.id) }}
                     </h3>
                     <p class="text-sm text-gray-500 mb-4">
                         This action will bypass normal order validation rules. Please provide a reason for this
@@ -57,6 +57,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { orderIdFormat } from '~/utils/functions/format'
 
 const props = defineProps({
     order: {

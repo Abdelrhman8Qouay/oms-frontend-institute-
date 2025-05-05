@@ -2,7 +2,7 @@ export enum UserRole {
     OWNER = 'owner',
     ADMIN = 'admin',
     CUSTOMER = 'customer',
-    GHOST = 'ghost',
+    GUEST = 'guest',
     CHEF = 'chef',
     CASHIER = 'cashier',
 }

@@ -1,14 +1,20 @@
 <template>
     <header class="bg-white shadow-md">
-        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+        <div class="px-2 py-4 flex justify-between items-center">
 
             <!-- Navigation -->
             <nav>
-                <!-- <button class="p-2 bg-gray-200 rounded">🔔 Notifications</button> -->
+                <button class="nav-btn">
+                    <Icon name="line-md:beer-alt-filled-loop" size="21" /> Cashier
+                </button>
+                <button class="nav-btn">
+                    <Icon name="material-symbols-light:conversion-path" mode="svg" size="21"
+                        class="stroke-current inline-block" /> Order Tracking
+                </button>
                 <div class="list">
                     <button @click="toggleProfileDropdown">
                         <img src="https://via.placeholder.com/40" alt="User" class="w-8 h-8 rounded-full" />
-                        <span class="text-gray-700">Admin</span>
+                        <span class="text-gray-700">Cashier</span>
                     </button>
                     <!-- Dropdown -->
                     <div v-if="isProfileDropdownOpen" class="dropdown">
@@ -34,13 +40,17 @@ const toggleProfileDropdown = () => {
 }
 
 const logout = async () => {
-    await authStore.logout('dashboard', $api)
+    await authStore.logout('staff', $api)
 }
 </script>
 
 <style scoped lang="scss">
 nav {
-    @apply flex items-center space-x-6;
+    @apply flex items-center space-x-2 w-full;
+
+    .nav-btn {
+        @apply p-2 bg-gray-200 rounded;
+    }
 
     button {
         @apply flex items-center space-x-2;
