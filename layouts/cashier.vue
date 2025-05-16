@@ -1,6 +1,6 @@
 <template>
     <div>
-        <LayoutsCashierHeader />
+        <LayoutsCashierHeader class="border-b border-black/30" />
         <slot />
         <LayoutsFooter />
     </div>

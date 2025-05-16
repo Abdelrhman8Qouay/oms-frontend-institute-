@@ -6,7 +6,7 @@
 
             <div class="h-full flex flex-col w-4/5 ml-[20%]">
                 <!-- Header -->
-                <LayoutsAdminHeader />
+                <LayoutsAdminHeader class="border-b border-black/30" />
 
 
                 <!-- Main Content -->

@@ -40,7 +40,7 @@ const logout = async () => {
 
 <style scoped lang="scss">
 nav {
-    @apply flex items-center space-x-6;
+    @apply flex justify-end items-center space-x-6;
 
     button {
         @apply flex items-center space-x-2;

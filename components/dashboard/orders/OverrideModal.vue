@@ -38,8 +38,8 @@
 
                 <div class="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
                     <button type="button" @click="submit" :disabled="!reason" :class="{
-                        'bg-yellow-600 hover:bg-yellow-700': !forceAction,
-                        'bg-orange-600 hover:bg-orange-700': forceAction,
+                        'bg-yellow-500 hover:bg-yellow-600': !forceAction,
+                        'bg-orange-500 hover:bg-orange-600': forceAction,
                         'opacity-50 cursor-not-allowed': !reason
                     }"
                         class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 text-base font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:col-start-2 sm:text-sm">

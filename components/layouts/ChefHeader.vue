@@ -10,17 +10,12 @@
                         <img src="/images/logo.png" class="w-full h-full object-cover" alt="system logo">
                     </div>
                 </NuxtLink>
-                <NuxtLink to="/staff/cashier/" class="nav-btn">
-                    <Icon name="line-md:beer-alt-filled-loop" size="21" /> Cashier
-                </NuxtLink>
-                <NuxtLink to="/staff/cashier/tracking" class="nav-btn">
-                    <Icon name="material-symbols-light:conversion-path" mode="svg" size="21"
-                        class="stroke-current inline-block" /> Order Tracking
-                </NuxtLink>
+
+                <!-- Dropdown -->
                 <div class="list">
                     <button @click="toggleProfileDropdown">
                         <img src="https://via.placeholder.com/40" alt="User" class="w-8 h-8 rounded-full" />
-                        <span class="text-gray-700">Cashier</span>
+                        <span class="text-gray-700">Chef</span>
                     </button>
                     <!-- Dropdown -->
                     <div v-if="isProfileDropdownOpen" class="dropdown">
@@ -52,7 +47,7 @@ const logout = async () => {
 
 <style scoped lang="scss">
 nav {
-    @apply flex justify-start items-center space-x-2 w-full;
+    @apply flex justify-start items-center space-x-2 w-full h-max;
 
     .nav-btn {
         @apply p-2 border border-gray-300/80 hover:border-none hover:bg-yellow-500 transition-all rounded flex items-center;

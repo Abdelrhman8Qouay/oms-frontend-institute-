@@ -1,27 +1,5 @@
 <template>
     <div class="admin-order-detail">
-        <!-- Page Header -->
-        <div class="flex justify-between items-start mb-6">
-            <div>
-                <NuxtLink to="/dashboard/orders" class="text-blue-600 hover:text-blue-800 flex items-center text-sm">
-                    <Icon name="chevron-left" class="w-4 h-4 mr-1" />
-                    Back to Orders
-                </NuxtLink>
-                <div class="flex items-center mt-2">
-                    <h1 class="text-2xl font-bold mr-3">
-                        Order #{{ order.id }}
-                    </h1>
-                    <LazyDashboardOrdersOrderStatusBadge :status="order.status" show-icon />
-                </div>
-                <p class="text-sm text-gray-500 mt-1">
-                    Created: {{ formatDateTime(order.createdAt) }}
-                    <span v-if="order.createdAt !== order.updatedAt">
-                        • Last updated: {{ formatDateTime(order.updatedAt) }}
-                    </span>
-                </p>
-            </div>
-            <DashboardOrdersOrderActionsDropdown :order="order" @action="handleOrderAction" />
-        </div>
 
         <!-- Loading State -->
         <CommonLoader v-if="isLoading" />
@@ -34,8 +12,52 @@
             </button>
         </div>
 
+        <!-- Empty/Initial State -->
+        <div v-else-if="!order"
+            class="flex flex-col items-center justify-center p-8 bg-white rounded-lg shadow-sm border border-gray-200">
+            <Icon name="mdi:receipt-text-outline" class="w-16 h-16 text-gray-400 mb-4" />
+            <h3 class="text-lg font-medium text-gray-700 mb-2">
+                No order selected
+            </h3>
+            <p class="text-gray-500 text-center max-w-md">
+                Enter an order ID above to track its status, view items, and manage
+                payment.
+            </p>
+        </div>
+
         <!-- Order Details -->
         <div v-else class="space-y-6">
+            <!-- Page Header -->
+            <div class="flex justify-between items-start mb-6">
+                <div>
+                    <NuxtLink to="/dashboard/orders"
+                        class="text-blue-600 hover:text-blue-800 flex items-center text-sm">
+                        <Icon name="chevron-left" class="w-4 h-4 mr-1" />
+                        Back to Orders
+                    </NuxtLink>
+                    <div class="flex items-center mt-2">
+                        <h1 class="text-2xl font-bold mr-3">
+                            Order #{{ order.id }}
+                        </h1>
+                        <LazyDashboardOrdersOrderStatusBadge :status="order.status" show-icon />
+                    </div>
+                    <p class="text-sm text-gray-500 mt-1">
+                        Created: {{ formatDateTime(order.createdAt) }}
+                        <span v-if="order.createdAt !== order.updatedAt">
+                            • Last updated: {{ formatDateTime(order.updatedAt) }}
+                        </span>
+                    </p>
+                </div>
+                <CommonDropdown title="Actions" icon="mdi:chevron-down">
+                    <button
+                        v-for="([btn, action], index) in [['Update Status', 'update'], ['Force Status', 'force'], ['Cancel Order', 'cancel'], ['Override', 'override'], ['View History', 'history']]"
+                        :key="index" @click.prevent="handleOrderAction(action, order)"
+                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
+                        {{ btn }}
+                    </button>
+                </CommonDropdown>
+            </div>
+
             <!-- Order Summary Card -->
             <div class="bg-white rounded-lg shadow overflow-hidden">
                 <div class="px-6 py-4 border-b border-gray-200">
@@ -191,15 +213,18 @@
                     <p class="text-sm text-gray-700">{{ order.metadata.adminNotes }}</p>
                 </div>
             </div>
+
+            <!-- Order Action Modals -->
+            <DashboardOrdersStatusUpdateModal v-if="showUpdateModal" :order="order" @close="showUpdateModal = false"
+                @submit="updateOrderStatus" />
+            <DashboardOrdersStatusForceModal v-if="showForceModal" :order="order" @close="showForceModal = false"
+                @submit="forceOrderStatus" />
+            <DashboardOrdersCancelModal v-if="showCancelModal" :order="order" @close="showCancelModal = false"
+                @submit="cancelOrder" />
+            <DashboardOrdersOverrideModal v-if="showOverrideModal" :order="order" @close="showOverrideModal = false"
+                @submit="overrideOrder" />
         </div>
 
-        <!-- Order Action Modals -->
-        <DashboardOrdersOrderStatusModal v-if="showStatusModal" :order="order" @close="showStatusModal = false"
-            @submit="updateOrderStatus" />
-        <DashboardOrdersOrderCancelModal v-if="showCancelModal" :order="order" @close="showCancelModal = false"
-            @submit="cancelOrder" />
-        <DashboardOrdersOrderOverrideModal v-if="showOverrideModal" :order="order" @close="showOverrideModal = false"
-            @submit="overrideOrder" />
     </div>
 </template>
 
@@ -218,29 +243,12 @@ const { $api } = useNuxtApp()
 const orderId = computed(() => route.params.orderId as string)
 
 // Order data
-const order = ref<OrderObject>({
-    id: '',
-    status: OrderStatus.PENDING,
-    type: OrderTypes.DINE_IN,
-    totalPrice: 0,
-    dailyQueueNumber: 0,
-    itemsCount: 0,
-    customerDetails: {
-        name: '',
-        phone: '',
-        address: ''
-    },
-    items: [],
-    createdAt: '',
-    updatedAt: ''
-})
+const order = ref<OrderObject | null>(null)
 
 // UI state
 const isLoading = ref(false)
 const error = ref<any>(null)
-const showStatusModal = ref(false)
-const showCancelModal = ref(false)
-const showOverrideModal = ref(false)
+
 
 // Fetch order data
 const fetchOrder = async () => {
@@ -258,11 +266,21 @@ const fetchOrder = async () => {
     }
 }
 
+
 // Handle order actions
-const handleOrderAction = (action: string) => {
+const showUpdateModal = ref(false)
+const showForceModal = ref(false)
+const showCancelModal = ref(false)
+const showOverrideModal = ref(false)
+
+const handleOrderAction = (action: string, order: any) => {
+    order.value = order
     switch (action) {
         case 'update':
-            showStatusModal.value = true
+            showUpdateModal.value = true
+            break
+        case 'force':
+            showForceModal.value = true
             break
         case 'cancel':
             showCancelModal.value = true
@@ -271,18 +289,31 @@ const handleOrderAction = (action: string) => {
             showOverrideModal.value = true
             break
         case 'history':
-            navigateTo(`/dashboard/orders/${orderId.value}/history`)
+            navigateTo(`/dashboard/orders/${order.id}/history`)
             break
     }
 }
 
-const updateOrderStatus = async (data: { status: string, notes?: string }) => {
+const updateOrderStatus = async (data: { status: OrderStatus, notes?: string }) => {
     try {
         await $api.put(ENDPOINTS.ADMIN_ORDERS.UPDATE_ORDER(orderId.value), {
             status: data.status,
             adminNotes: data.notes
         })
-        showStatusModal.value = false
+        showUpdateModal.value = false
+        fetchOrder()
+    } catch (err) {
+        console.error('Failed to update order:', err)
+    }
+}
+
+const forceOrderStatus = async (data: { status: OrderStatus, reason: string, force: boolean }) => {
+    try {
+        await $api.put(ENDPOINTS.ADMIN_ORDERS.FORCE_ORDER_STATUS(orderId.value, data.status), {
+            reason: data.reason,
+            force: data.force
+        })
+        showForceModal.value = false
         fetchOrder()
     } catch (err) {
         console.error('Failed to update order:', err)

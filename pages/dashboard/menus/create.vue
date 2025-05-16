@@ -55,17 +55,30 @@
                 <div v-else class="space-y-4">
                     <div v-for="(category, catIndex) in menuForm.categories" :key="catIndex"
                         class="border border-gray-200 rounded-lg p-4">
-                        <div class="flex justify-between items-start mb-3">
-                            <div class="flex-1">
-                                <label :for="`category-name-${catIndex}`"
-                                    class="block text-sm font-medium text-gray-700">Category Name *</label>
-                                <input v-model="category.name" :id="`category-name-${catIndex}`" type="text" required
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
-                                <p v-if="errors[`categories[${catIndex}].name`]" class="mt-1 text-sm text-red-600">
-                                    {{ errors[`categories[${catIndex}].name`] }}
-                                </p>
+                        <div class="flex justify-between">
+                            <div class="flex flex-1 gap-2 items-start mb-3">
+                                <div class="flex-1">
+                                    <label :for="`category-name-${catIndex}`"
+                                        class="block text-sm font-medium text-gray-700">Category Name *</label>
+                                    <input v-model="category.name" :id="`category-name-${catIndex}`" type="text"
+                                        required
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                                    <p v-if="errors[`categories[${catIndex}].name`]" class="mt-1 text-sm text-red-600">
+                                        {{ errors[`categories[${catIndex}].name`] }}
+                                    </p>
+                                </div>
+                                <!-- Display Order -->
+                                <div class="flex-1" title="Sort this category in the menu">
+                                    <label :for="`category-order-${catIndex}`"
+                                        class="block text-sm font-medium text-gray-700">Display Order <span
+                                            title="Sort this category in the menu">?</span></label>
+                                    <input v-model.number="category.displayOrder" :id="`category-order-${catIndex}`"
+                                        type="number" min="1"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                                </div>
                             </div>
-                            <div class="ml-4 flex items-start">
+
+                            <div class="ml-4 flex flex-col items-center">
                                 <label class="inline-flex items-center">
                                     <input v-model="category.isActive" type="checkbox"
                                         class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-500 focus:ring-blue-500">
@@ -76,15 +89,6 @@
                                     <Icon name="trash" class="w-5 h-5" />
                                 </button>
                             </div>
-                        </div>
-
-                        <!-- Display Order -->
-                        <div class="mb-3">
-                            <label :for="`category-order-${catIndex}`"
-                                class="block text-sm font-medium text-gray-700">Display Order</label>
-                            <input v-model.number="category.displayOrder" :id="`category-order-${catIndex}`"
-                                type="number" min="1"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
                         </div>
 
                         <!-- Items Section -->
@@ -106,8 +110,8 @@
                                 <div v-for="(item, itemIndex) in category.items" :key="itemIndex"
                                     class="border border-gray-100 rounded p-3">
                                     <div class="flex justify-between items-start">
-                                        <div class="flex-1 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                                            <div>
+                                        <div class="flex-1 flex items-center flex-wrap gap-2">
+                                            <div class="flex-1">
                                                 <label :for="`item-name-${catIndex}-${itemIndex}`"
                                                     class="block text-xs font-medium text-gray-700">Name *</label>
                                                 <input v-model="item.name" :id="`item-name-${catIndex}-${itemIndex}`"
@@ -118,11 +122,11 @@
                                                     {{ errors[`categories[${catIndex}].items[${itemIndex}].name`] }}
                                                 </p>
                                             </div>
-                                            <div>
+                                            <div class="flex-1">
                                                 <label :for="`item-price-${catIndex}-${itemIndex}`"
                                                     class="block text-xs font-medium text-gray-700">Price *</label>
                                                 <input v-model.number="item.price"
-                                                    :id="`item-price-${catIndex}-${itemIndex}`" type="number" min="0"
+                                                    :id="`item-price-${catIndex}-${itemIndex}`" type="number" min="0.01"
                                                     step="0.01" required
                                                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
                                                 <p v-if="errors[`categories[${catIndex}].items[${itemIndex}].price`]"
@@ -130,7 +134,20 @@
                                                     {{ errors[`categories[${catIndex}].items[${itemIndex}].price`] }}
                                                 </p>
                                             </div>
-                                            <div class="sm:col-span-2">
+                                            <div class="flex-1">
+                                                <label :for="`item-preparation-${catIndex}-${itemIndex}`"
+                                                    class="block text-xs font-medium text-gray-700">Preparation Time
+                                                    *</label>
+                                                <input v-model.number="item.preparationTime"
+                                                    :id="`item-preparation-${catIndex}-${itemIndex}`" type="number"
+                                                    min="0" step="0" required
+                                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                                                <p v-if="errors[`categories[${catIndex}].items[${itemIndex}].price`]"
+                                                    class="mt-1 text-xs text-red-600">
+                                                    {{ errors[`categories[${catIndex}].items[${itemIndex}].price`] }}
+                                                </p>
+                                            </div>
+                                            <div class="[flex:1_0_100%]">
                                                 <label :for="`item-desc-${catIndex}-${itemIndex}`"
                                                     class="block text-xs font-medium text-gray-700">Description</label>
                                                 <textarea v-model="item.description"
@@ -187,6 +204,7 @@
 import type { MenuObject } from '~/utils/types/menu.type'
 import { ENDPOINTS } from '~/utils/constants/apiEndpoints'
 import type { AxiosError } from 'axios'
+import { fixedFraction } from '~/utils/functions/format'
 
 const router = useRouter()
 const { $api } = useNuxtApp()
@@ -209,6 +227,7 @@ const menuForm = reactive({
             price: number
             description: string
             isAvailable: boolean
+            preparationTime: number
         }>
     }>
 })
@@ -242,9 +261,10 @@ const removeCategory = (index: number) => {
 const addNewItem = (categoryIndex: number) => {
     menuForm.categories[categoryIndex].items.push({
         name: '',
-        price: 0,
+        price: 0.00,
         description: '',
-        isAvailable: true
+        isAvailable: true,
+        preparationTime: 0
     })
 }
 
@@ -282,6 +302,10 @@ const validateForm = (): boolean => {
                 errors.value[`categories[${catIndex}].items[${itemIndex}].price`] = 'Valid price is required'
                 isValid = false
             }
+            if (item.preparationTime === null || isNaN(item.preparationTime) || item.preparationTime < 0) {
+                errors.value[`categories[${catIndex}].items[${itemIndex}].preparation`] = 'Valid preparation is required'
+                isValid = false
+            }
         })
     })
 
@@ -307,7 +331,8 @@ const handleSubmit = async () => {
                 isActive: cat.isActive,
                 items: cat.items.map(item => ({
                     name: item.name,
-                    price: item.price,
+                    price: fixedFraction(item.price, 2),
+                    preparationTime: item.preparationTime,
                     description: item.description,
                     isAvailable: item.isAvailable
                 }))

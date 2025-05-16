@@ -25,6 +25,7 @@ const toggleAvailability = async () => {
     <div class="flex items-center justify-between p-2 border border-gray-100 rounded hover:bg-gray-50">
         <div class="flex-1 min-w-0">
             <div class="flex items-center gap-2">
+                <Icon name="material-symbols-light:emoji-food-beverage-outline-rounded" class="text-gray-500" />
                 <h4 class="font-medium truncate">{{ item.name }}</h4>
                 <span class="text-sm text-gray-500">${{ fixedFraction(2) }}</span>
             </div>
@@ -37,9 +38,9 @@ const toggleAvailability = async () => {
             }">
                 {{ isAvailable ? 'Available' : 'Unavailable' }}
             </button>
-            <button class="p-1 text-gray-500 hover:text-gray-700">
+            <!-- <button class="p-1 text-gray-500 hover:text-gray-700">
                 <Icon name="mdi-light:pencil" class="w-4 h-4" />
-            </button>
+            </button> -->
         </div>
     </div>
 </template>

@@ -1,43 +1,42 @@
 <template>
-    <div class="min-h-screen bg-white text-black p-6">
+    <div class="min-h-screen text-black p-6">
         <!-- Header -->
-        <div class="header mb-6 p-2">
-            <h1 class="text-3xl font-bold">Kitchen Order Management</h1>
-            <div class="flex space-x-4 mt-4">
-                <!-- Filter Dropdown -->
-                <select v-model="filterStatus" class="p-2 bg-yellow-200 rounded" @change="fetchQueueOrders">
-                    <option value="all">All</option>
-                    <option v-for="type in Object.values(OrderStatus)" :key="type" :value="type">
-                        {{ formatReadableText(type) }}
-                    </option>
-                </select>
-
+        <div class="header w-full flex flex-col items-center gap-4 bg-white p-4 rounded-lg shadow mb-6">
+            <h1 class="text-2xl font-bold text-gray-800">
+                <Icon name="mdi:chef-hat" mode="svg" size="30" class="stroke-white inline-block" />
+                Kitchen Order Management
+            </h1>
+            <div class="flex items-center gap-4 bg-white p-4 rounded-lg shadow mb-6">
                 <!-- Sort Dropdown -->
-                <select v-model="sortBy" class="p-2 bg-yellow-200 rounded" @change="fetchQueueOrders">
+                <select v-model="sortBy" class="p-2 bg-yellow-500 rounded" @change="fetchQueueOrders">
                     <option v-for="col in Object.values(OrderSortBy)" :key="col" :value="col">
                         {{ formatReadableText(col) }}
                     </option>
                 </select>
 
                 <!-- Notification Toggle -->
-                <button @click="toggleNotifications" class="p-2 bg-yellow-200 rounded flex items-center gap-2">
-                    <Icon name="material-symbols-light:notifications-active-outline" size="25" />
-                    {{ notificationsEnabled ? 'Disable Notifications' : 'Enable Notifications' }}
+                <button @click="toggleNotificationSound"
+                    :title="notificationsEnabled ? 'Disable notification' : 'Enable notification'"
+                    class="p-2 bg-yellow-500 rounded flex items-center gap-2">
+                    <Icon
+                        :name="notificationsEnabled ? 'ic:outline-notifications-active' : 'ic:outline-notifications-none'"
+                        size="25" />
                 </button>
             </div>
         </div>
 
         <!-- Kanban Board -->
-        <div class="w-full h-max" v-auto-animate>
+        <div class="w-full flex items-center gap-4 bg-white p-4 rounded-lg shadow mb-6" v-auto-animate>
             <div v-if="isQueueGetLoading" class="w-full h-full flex justify-center items-center">
                 <CommonLoader :prevent-interaction="true" animation-type="fade" />
             </div>
             <div v-else class="flex flex-wrap justify-between gap-3">
                 <!-- Pending Orders -->
-                <div class="bg-yellow-400 p-4 rounded-lg md:[flex:1_0_32%] [flex:1_0_30%]">
+                <div
+                    class="h-max border border-yellow-500 shadow-lg shadow-yellow-500 p-4 rounded-lg md:[flex:1_0_32%] [flex:1_0_30%]">
                     <h2 class="text-base font-semibold mb-4 mt-3">🟡 Pending</h2>
                     <div v-for="order in filteredOrders(OrderStatus.PENDING)" :key="order.id"
-                        class="text-base mb-4 p-4 bg-white rounded-lg">
+                        class="text-base mb-4 p-4 bg-white rounded-lg shadow-md">
                         <ChefOrderCard :order="order" @cancel-order="(id) => orderRequest(id, 'cancel')"
                             @claim-order="(id) => orderRequest(id, 'claim')"
                             @complete-order="(id) => orderRequest(id, 'complete')" />
@@ -45,17 +44,18 @@
                 </div>
 
                 <!-- In Progress Orders -->
-                <div class="bg-blue-400 p-4 rounded-lg md:[flex:1_0_43%] [flex:1_0_66%]">
+                <div
+                    class="h-max border border-blue-500 shadow-lg shadow-blue-500 p-4 rounded-lg md:[flex:1_0_43%] [flex:1_0_66%]">
                     <h2 class="text-xl font-semibold mb-4">🔵 In Progress</h2>
                     <div v-for="order in filteredOrders(OrderStatus.IN_PROGRESS)" :key="order.id"
-                        class="mb-4 p-4 bg-white rounded-lg">
+                        class="mb-4 p-4 bg-white rounded-lg shadow-lg">
                         <ChefOrderCard :order="order" @claim-order="(id) => orderRequest(id, 'claim')"
                             @complete-order="(id) => orderRequest(id, 'complete')" />
                     </div>
                 </div>
 
                 <!-- Completed Orders -->
-                <div class="bg-green-400 p-4 rounded-lg md:[flex:1_0_20%] [flex:1_0_95%]">
+                <div class="h-max border border-green-500 p-4 rounded-lg md:[flex:1_0_20%] [flex:1_0_95%] opacity-60">
                     <h2 class="text-base font-semibold mb-4">✅ Completed</h2>
                     <div v-for="order in filteredOrders(OrderStatus.COMPLETED)" :key="order.id"
                         class="text-base mb-4 p-4 bg-white rounded-lg">
@@ -72,17 +72,24 @@
 </template>
 
 <script setup lang="ts">
-import { OrderSortBy, OrderStatus, OrderTypes } from '~/utils/types/order.type';
+import { OrderStatus, OrderTypes } from '~/utils/types/order.type';
 import { useAxios } from '@vueuse/integrations/useAxios.mjs';
 import { ENDPOINTS } from '~/utils/constants/apiEndpoints';
 import { formatReadableText } from '~/utils/functions/format';
 import { UserRole } from '~/utils/types/user.type';
 import type { OrderUpdateListened } from '~/utils/types/chef.type';
 
+enum OrderSortBy {
+    CREATED_AT = 'created_at',
+    UPDATED_AT = 'updated_at',
+    ITEMS_COUNT = 'items_count',
+    PRICE = 'price'
+}
+
 const { $api } = useNuxtApp(); // Access Axios from plugin
 
 // ===================================== State
-const { isConnected, connectSocket, joinRoom, listenToEvent } = useSocketIo();
+const { connectSocket, joinRoom, listenToEvent } = useSocketIo();
 
 const orders = ref<any[]>([]);
 const filterStatus = ref('all');
@@ -154,7 +161,7 @@ const orderRequest = async (orderId: string, request: orderRequestTypes) => {
 
 
 // Toggle notifications
-const toggleNotifications = () => {
+const toggleNotificationSound = () => {
     notificationsEnabled.value = !notificationsEnabled.value;
 };
 

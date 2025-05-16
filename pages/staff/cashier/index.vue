@@ -1,17 +1,24 @@
 <template>
-    <div class="min-h-screen bg-gray-100">
+    <div class="min-h-screen">
         <!-- Header -->
         <div class="bg-white shadow-sm">
             <div class="max-w-7xl mx-auto px-4 py-4">
                 <div class="flex justify-between items-center">
-                    <div
-                        class="border border-gray-300 bg-gray-300/30 rounded-sm text-gray-600 text-sm font-semibold px-1 py-[1px]">
-                        {{
-                            currentMenu?.name }}</div>
+                    <div class="flex items-center gap-2">
+                        <h1 class="text-2xl font-bold text-gray-800">
+                            <Icon name="line-md:beer-alt-filled-loop" mode="svg" size="30"
+                                class="stroke-white inline-block" />
+                            Cashier
+                        </h1>
+                        <div
+                            class="flex items-center border border-gray-300 bg-gray-300/30 rounded-sm text-gray-600 text-xs font-semibold px-2 py-[1px]">
+                            {{
+                                currentMenu?.name }}</div>
+                    </div>
                     <div class="flex space-x-4">
                         <button v-for="type in Object.values(OrderTypes)" :key="type" :class="[
                             'px-4 py-2 rounded-md',
-                            orderType === type ? 'bg-yellow-600 text-white' : 'bg-gray-200 text-gray-700',
+                            orderType === type ? 'bg-yellow-500' : 'bg-gray-200 text-gray-700',
                         ]" @click="setOrderType(type)">
                             {{ formatReadableText(type) }}
                         </button>
@@ -41,7 +48,7 @@
                                 <li v-for="category in currentMenu?.categories" :key="category.id" :class="[
                                     'px-2 py-1 rounded-md whitespace-nowrap flex items-center justify-between cursor-pointer',
                                     currentCategory?.id === category.id
-                                        ? 'bg-yellow-600 text-white'
+                                        ? 'bg-yellow-500 text-white'
                                         : 'bg-gray-200 text-gray-700',
                                 ]" @click="selectCategory(category)">
                                     <span>{{ category.name }}</span>
@@ -120,7 +127,7 @@
 
                         <!-- Submit Button -->
                         <button type="button"
-                            class="w-full mt-4 px-4 py-2 bg-yellow-600 text-white rounded-md disabled:bg-gray-400"
+                            class="w-full mt-4 px-4 py-2 bg-yellow-500 text-white rounded-md disabled:bg-gray-400"
                             :disabled="!canSubmitOrder" @click="submitOrder">
                             Submit Order
                         </button>
@@ -155,7 +162,7 @@ definePageMeta({
     layout: 'cashier',
 })
 
-const menuStore = useMenuStore()
+// const menuStore = useMenuStore()
 
 // State
 const currentMenu = ref<MenuObject>({});
@@ -218,11 +225,11 @@ async function fetchCurrentMenu() {
     // }
 
     // Get menu by menu_id if exists
-    currentMenuId.value = menuStore.menuIdCache.cashier.get();
-    if (!currentMenuId.value) {
-        currentMenuId.value = crypto.randomUUID(); // Generate a new UUID if no menuId is cached
-        console.warn('Cache Empty: replaced Empty menu_id with New id');
-    }
+    // currentMenuId.value = menuStore.menuIdCache.cashier.get();
+    // if (!currentMenuId.value) {
+    //     currentMenuId.value = crypto.randomUUID(); // Generate a new UUID if no menuId is cached
+    //     console.warn('Cache Empty: replaced Empty menu_id with New id');
+    // }
     await executeCurrentMenu(ENDPOINTS.CASHIER.CURRENT_CASHIER_MENU(currentMenuId.value))
 }
 

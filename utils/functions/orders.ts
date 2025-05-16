@@ -13,7 +13,7 @@ export function formatType(type: OrderTypes) {
 
 // Badge classes
 export function statusBadgeClass(status: OrderStatus) {
-    const base = 'px-2 inline-flex text-xs leading-5 font-semibold rounded-full'
+    const base = 'px-2 inline-flex items-center text-xs leading-5 font-semibold rounded-full'
     switch (status) {
         case OrderStatus.IN_PROGRESS:
             return `${base} bg-blue-100 text-blue-800`

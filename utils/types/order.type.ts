@@ -18,12 +18,6 @@ export enum OrderTypes {
     DELIVERY = 'delivery',
 }
 
-export enum OrderSortBy {
-    CREATED_AT = 'created_at',
-    UPDATED_AT = 'updated_at',
-    ITEMS_COUNT = 'items_count',
-    PRICE = 'price'
-}
 
 export enum OrderActionType {
     CREATED = 'created',

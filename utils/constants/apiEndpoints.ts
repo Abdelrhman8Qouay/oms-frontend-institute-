@@ -39,7 +39,7 @@ export const ENDPOINTS = {
         TOGGLE_ACTIVE_MENU: (menuId: string) => `/admin/menus/${menuId}/active`,
         UPDATE_MENU: (menuId: string) => `/admin/menus/${menuId}`,
         DELETE_MENU: (menuId: string) => `/admin/menus/${menuId}`,
-        TOGGLE_AVAILABILITY: (menuId: string) => `/admin/menus/${menuId}/availability`,
+        // TOGGLE_AVAILABILITY: (menuId: string) => `/admin/menus/${menuId}/availability`,
     },
     ADMIN_ORDERS: {
         GET_ORDERS: '/admin/orders',

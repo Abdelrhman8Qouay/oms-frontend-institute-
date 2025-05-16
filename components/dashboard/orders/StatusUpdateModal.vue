@@ -16,11 +16,19 @@
 
                     <div class="mb-4">
                         <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                        <select v-model="status" class="w-full rounded-md border-gray-300 shadow-sm">
-                            <option v-for="s in orderStatuses" :key="s" :value="s">
-                                {{ formatStatus(s) }}
-                            </option>
-                        </select>
+                        <div class="w-full flex gap-4">
+                            <span :class="statusBadgeClass(currentStatus)">{{ formatStatus(currentStatus) }}</span>
+                            <span class="bin">
+                                <Icon name="mdi:hand-pointing-right" size="25" />
+                            </span>
+                            <select v-model="newStatus" class="rounded-md border-gray-300 shadow-sm">
+                                <option v-for="(s, i) in validTransitions[currentStatus]" :key="i" :value="s"
+                                    :class="statusBadgeClass(s)">
+                                    {{ formatStatus(s) }}
+                                </option>
+                            </select>
+                            <span class="text-sm font-medium text-gray-700 mb-1">Valid Transitions</span>
+                        </div>
                     </div>
 
                     <div>
@@ -31,8 +39,8 @@
                 </div>
 
                 <div class="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
-                    <button type="button" @click="submit"
-                        class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:col-start-2 sm:text-sm">
+                    <button :disabled="!newStatus" type="button" @click="submit"
+                        class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:col-start-2 sm:text-sm">
                         Update
                     </button>
                     <button type="button" @click="$emit('close')"
@@ -46,10 +54,30 @@
 </template>
 
 <script setup lang="ts">
-import { formatStatus } from '~/utils/functions/orders'
+import { formatStatus, statusBadgeClass } from '~/utils/functions/orders'
 import { OrderStatus } from '~/utils/types/order.type'
 
-const orderStatuses = Object.values(OrderStatus)
+const validTransitions: Record<OrderStatus, OrderStatus[]> = {
+    [OrderStatus.PENDING]: [
+        OrderStatus.IN_PROGRESS,
+        OrderStatus.CANCELED,
+        OrderStatus.FAILED,
+    ],
+    [OrderStatus.IN_PROGRESS]: [
+        OrderStatus.COMPLETED,
+        OrderStatus.CANCELED,
+        OrderStatus.FAILED,
+    ],
+    [OrderStatus.COMPLETED]: [
+        OrderStatus.DELIVERED,
+        OrderStatus.CANCELED,
+        OrderStatus.FAILED,
+    ],
+    [OrderStatus.DELIVERED]: [],
+    [OrderStatus.CANCELED]: [],
+    [OrderStatus.FAILED]: []
+}
+
 
 const props = defineProps({
     order: {
@@ -60,14 +88,32 @@ const props = defineProps({
 
 const emit = defineEmits(['close', 'submit'])
 
-const status = ref(props.order.status)
-const notes = ref(props.order.adminNotes || '')
+const currentStatus = ref<OrderStatus>(props.order.status)
+const newStatus = ref()
 
+const notes = ref(props.order.adminNotes || '')
 
 const submit = () => {
     emit('submit', {
-        status: status.value,
+        status: newStatus.value,
         notes: notes.value
     })
 }
 </script>
+
+<style lang="scss">
+.bin {
+    position: relative;
+    animation: both infinite ease-in-out;
+}
+
+@keyframes both {
+    from {
+        transform: translateX(-50%);
+    }
+
+    to {
+        transform: translateX(50%);
+    }
+}
+</style>

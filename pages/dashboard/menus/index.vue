@@ -36,7 +36,8 @@
         <div v-else class="bg-white rounded-lg shadow overflow-hidden">
             <ul class="divide-y divide-gray-200">
                 <DashboardMenuCollapsibleMenu v-for="menu in safeMenus" :key="menu.id" :menu="menu"
-                    :default-open="safeMenus.length === 1" @toggle-activation="toggleActiveMenu" />
+                    :default-open="safeMenus.length === 1" @toggle-activation="toggleActiveMenu"
+                    @delete-menu="deleteMenu" />
             </ul>
 
             <!-- Pagination -->
@@ -101,6 +102,17 @@ const fetchMenus = async () => {
 const toggleActiveMenu = async (menuId: string) => {
     try {
         const response = await $api.put(ENDPOINTS.ADMIN_MENUS.TOGGLE_ACTIVE_MENU(menuId))
+
+        fetchMenus()
+    } catch (err) {
+        error.value = err
+        console.error('Failed to toggle active menu:', err)
+    }
+}
+
+const deleteMenu = async (menuId: string) => {
+    try {
+        const response = await $api.delete(ENDPOINTS.ADMIN_MENUS.DELETE_MENU(menuId))
 
         fetchMenus()
     } catch (err) {

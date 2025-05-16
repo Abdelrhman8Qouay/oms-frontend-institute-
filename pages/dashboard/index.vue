@@ -1,22 +1,25 @@
 <template>
     <div class="admin">
         <!-- Page Title -->
-        <h1 class="text-2xl font-bold mb-6">📊 Dashboard</h1>
+        <h1 class="text-2xl font-bold text-gray-800 mb-4">
+            <Icon name="material-symbols-light:dashboard" mode="svg" size="30" class="stroke-white inline-block" />
+            Dashboard
+        </h1>
 
         <!-- <CommonLoader v-if="isStatsLoading" isFullScreen preventInteraction /> -->
 
         <!-- Key Metrics -->
         <DashboardMetrics />
 
-        <!-- AI Insights -->
-        <DashboardAIInsights :data="aiInsights" :loading="isAiInsightsLoading" />
-
         <!-- Charts -->
         <DashboardCharts :revenue="revenueData" :popularItems="popularItemsData"
             :loading="isRevenueLoading || isPopularItemsLoading" />
 
+        <!-- AI Insights -->
+        <DashboardAIInsights />
+
         <!-- Menu Management -->
-        <DashboardMenuManagement />
+        <!-- <DashboardMenuManagement /> -->
     </div>
 </template>
 
@@ -35,7 +38,6 @@ const { $api } = useNuxtApp()
 // Reactive state for dashboard data
 const revenueData = ref<RevenueAnalyticsDto | null>(null)
 const popularItemsData = ref<PopularItemDto[]>([])
-const aiInsights = ref<any>(null)
 
 // Fetch revenue analytics
 const { isLoading: isRevenueLoading, execute: fetchRevenue } = useAxios(
@@ -73,28 +75,9 @@ const { isLoading: isPopularItemsLoading, execute: fetchPopularItems } = useAxio
     }
 )
 
-// Fetch AI insights
-const { isLoading: isAiInsightsLoading, execute: fetchAiInsights } = useAxios(
-    ENDPOINTS.ADMIN_DASHBOARD.GET_AI_INSIGHTS,
-    { method: 'GET' },
-    $api,
-    {
-        initialData: [],
-        immediate: false,
-        onSuccess(data) {
-            aiInsights.value = data
-            console.log('Fetched ai insights: ', data)
-        },
-        onError(err) {
-            console.error('Failed to fetch AI insights:', err)
-        },
-    }
-)
-
 // Fetch all data on page load
 onMounted(() => {
     fetchRevenue()
     fetchPopularItems()
-    fetchAiInsights()
 })
 </script>

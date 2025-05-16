@@ -1,9 +1,9 @@
 <template>
-    <aside class="bg-gray-900 shadow-md">
+    <aside class="bg-[var(--admin-color)] shadow-md">
         <nav class="p-6">
             <!-- Logo -->
             <div class="text-2xl mb-10 font-bold text-blue-600 flex flex-col justify-center items-center">
-                <span>🍔</span> <span>Restaurant Admin</span>
+                <img src="/images/logo.png" class="w-13 aspect-auto object-cover" alt="system logo">
             </div>
 
             <!-- Sidebar Menu -->

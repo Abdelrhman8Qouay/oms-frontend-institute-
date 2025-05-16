@@ -146,6 +146,16 @@ Check out the [deployment documentation](https://nuxt.com/docs/getting-started/d
 7. [Update (User role)]
 8. [Update (Page Layouts)] some of changes for the layout of all pages to get something specific as needed
 
+## Notes Now
+
+1 proceed the rest of (chef) and (dashboard) design
+2 put the metadata for each order details
+3 update statistics of home dashboard (to avoid orders that failed or canceled )
+4 Full check menu management in dashboard
+5 Clear all consols (that is unnecessary)
+6 Pack up this for the final project (and make this for upgrades)
+7 Remove All Not needed tools and modules and dependencies
+
 ## Dependencies Installed
 
 -   vueuse (Module)

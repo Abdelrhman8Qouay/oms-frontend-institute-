@@ -11,7 +11,7 @@ const toggle = () => {
     isOpen.value = !isOpen.value
 }
 
-defineEmits(['toggle-activation'])
+defineEmits(['toggle-activation', 'delete-menu'])
 </script>
 
 <template>
@@ -31,6 +31,10 @@ defineEmits(['toggle-activation'])
                     }">
                     {{ menu.isActive ? 'Active' : 'Inactive' }}
                 </button>
+                <button type='button' @click.prevent="$emit('delete-menu', menu.id)"
+                    class="px-2 py-1 text-xs rounded-md cursor-pointer border border-red-500 hover:bg-red-500 hover:text-white transition-all">
+                    Delete
+                </button>
                 <Icon name="mdi-light:chevron-down" class="transition-transform duration-200 text-gray-400"
                     :class="{ 'transform rotate-180': isOpen }" />
             </div>
@@ -46,9 +50,9 @@ defineEmits(['toggle-activation'])
             </div>
 
             <div class="flex justify-end gap-2 pt-2 border-t border-gray-100 mt-2">
-                <button class="text-xs text-blue-600 hover:text-blue-800">
+                <!-- <button class="text-xs text-blue-600 hover:text-blue-800">
                     Add Category
-                </button>
+                </button> -->
                 <NuxtLink :to="'/dashboard/menus/' + menu.id" class="text-xs text-gray-600 hover:text-gray-800">
                     Edit Menu
                 </NuxtLink>

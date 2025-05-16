@@ -3,7 +3,7 @@
         <!-- Page Header -->
         <div class="flex justify-between items-center mb-6">
             <h1 class="text-2xl font-bold">
-                {{ menuData?.id ? `Edit ${menuData.name}` : 'Create New Menu' }}
+                {{ menuData?.id ? `Edit ${menuData.name}` : 'Edit <empty name>' }}
             </h1>
             <NuxtLink to="/dashboard/menus" class="text-blue-600 hover:text-blue-800">
                 ← Back to Menus
@@ -53,7 +53,7 @@
             </div>
 
             <!-- Categories Section -->
-            <div class="p-6 border-b border-gray-200">
+            <div class="p-6 border-b border-gray-300">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-lg font-medium">Categories</h2>
                     <button type="button" @click="addNewCategory"
@@ -68,13 +68,25 @@
 
                 <div v-else class="space-y-4">
                     <div v-for="(category, catIndex) in menuForm.categories" :key="catIndex"
-                        class="border border-gray-200 rounded-lg p-4">
+                        class="border border-gray-300 rounded-lg p-4">
                         <div class="flex justify-between items-start mb-3">
-                            <div class="flex-1">
-                                <label :for="`category-name-${catIndex}`"
-                                    class="block text-sm font-medium text-gray-700">Category Name</label>
-                                <input v-model="category.name" :id="`category-name-${catIndex}`" type="text" required
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                            <div class="flex items-center w-full">
+                                <div class="flex-1">
+                                    <label :for="`category-name-${catIndex}`"
+                                        class="block text-sm font-medium text-gray-700">Category Name</label>
+                                    <input v-model="category.name" :id="`category-name-${catIndex}`" type="text"
+                                        required
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                                </div>
+                                <!-- Display Order -->
+                                <div class="flex-1">
+                                    <label :for="`category-order-${catIndex}`"
+                                        class="block text-sm font-medium text-gray-700">Display Order <span
+                                            title="Sort this category in the menu">?</span></label>
+                                    <input v-model.number="category.displayOrder" :id="`category-order-${catIndex}`"
+                                        type="number" min="1"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                                </div>
                             </div>
                             <div class="ml-4 flex items-start">
                                 <label class="inline-flex items-center">
@@ -87,15 +99,6 @@
                                     <Icon name="trash" class="w-5 h-5" />
                                 </button>
                             </div>
-                        </div>
-
-                        <!-- Display Order -->
-                        <div class="mb-3">
-                            <label :for="`category-order-${catIndex}`"
-                                class="block text-sm font-medium text-gray-700">Display Order</label>
-                            <input v-model.number="category.displayOrder" :id="`category-order-${catIndex}`"
-                                type="number" min="1"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
                         </div>
 
                         <!-- Items Section -->
@@ -114,25 +117,34 @@
 
                             <div v-else class="space-y-3">
                                 <div v-for="(item, itemIndex) in category.items" :key="itemIndex"
-                                    class="border border-gray-100 rounded p-3">
+                                    class="border border-gray-300 rounded-lg p-3">
                                     <div class="flex justify-between items-start">
-                                        <div class="flex-1 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                                            <div>
+                                        <div class="flex-1 flex flex-wrap items-center gap-2">
+                                            <div class="flex-1">
                                                 <label :for="`item-name-${catIndex}-${itemIndex}`"
                                                     class="block text-xs font-medium text-gray-700">Name</label>
                                                 <input v-model="item.name" :id="`item-name-${catIndex}-${itemIndex}`"
                                                     type="text" required
                                                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
                                             </div>
-                                            <div>
+                                            <div class="flex-1">
                                                 <label :for="`item-price-${catIndex}-${itemIndex}`"
                                                     class="block text-xs font-medium text-gray-700">Price</label>
                                                 <input v-model.number="item.price"
-                                                    :id="`item-price-${catIndex}-${itemIndex}`" type="number" min="0"
+                                                    :id="`item-price-${catIndex}-${itemIndex}`" type="number" min="0.01"
                                                     step="0.01" required
                                                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
                                             </div>
-                                            <div class="sm:col-span-2">
+                                            <div class="flex-1">
+                                                <label :for="`item-preparation-${catIndex}-${itemIndex}`"
+                                                    class="block text-xs font-medium text-gray-700">Preparation
+                                                    Time</label>
+                                                <input v-model.number="item.preparationTime"
+                                                    :id="`item-preparation-${catIndex}-${itemIndex}`" type="number"
+                                                    min="0" step="1" required
+                                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                                            </div>
+                                            <div class="[flex:1_0_100%]">
                                                 <label :for="`item-desc-${catIndex}-${itemIndex}`"
                                                     class="block text-xs font-medium text-gray-700">Description</label>
                                                 <textarea v-model="item.description"
@@ -188,6 +200,7 @@
 <script setup lang="ts">
 import type { MenuObject, MenuCategory, MenuItem } from '~/utils/types/menu.type'
 import { ENDPOINTS } from '~/utils/constants/apiEndpoints'
+import { fixedFraction } from '~/utils/functions/format'
 
 const route = useRoute()
 const router = useRouter()
@@ -214,6 +227,7 @@ const menuForm = reactive({
             id?: string
             name: string
             price: number
+            preparationTime: number
             description: string
             isAvailable: boolean
         }>
@@ -246,7 +260,8 @@ const fetchMenu = async () => {
                 items: (cat.items as MenuItem[])?.map((item: MenuItem) => ({
                     id: item.id,
                     name: item.name || '',
-                    price: item.price || 0,
+                    price: fixedFraction(item.price || 0),
+                    preparationTime: item.preparationTime || 0,
                     description: item.description || '',
                     isAvailable: item.isAvailable !== false
                 })) || []
@@ -296,6 +311,7 @@ const addNewItem = (categoryIndex: number) => {
     menuForm.categories[categoryIndex].items.push({
         name: '',
         price: 0,
+        preparationTime: 0,
         description: '',
         isAvailable: true
     })
@@ -316,14 +332,13 @@ const handleSubmit = async () => {
             description: menuForm.description,
             isActive: menuForm.isActive,
             categories: menuForm.categories.map(cat => ({
-                id: cat.id,
                 name: cat.name,
                 displayOrder: cat.displayOrder,
                 isActive: cat.isActive,
                 items: cat.items.map(item => ({
-                    id: item.id,
                     name: item.name,
-                    price: item.price,
+                    price: fixedFraction(item.price || 0, 2),
+                    preparationTime: item.preparationTime || 0,
                     description: item.description,
                     isAvailable: item.isAvailable
                 }))

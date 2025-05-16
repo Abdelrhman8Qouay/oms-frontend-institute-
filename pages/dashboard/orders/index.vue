@@ -73,7 +73,7 @@
 
         <!-- Orders Table -->
         <div v-else class="bg-white rounded-lg shadow">
-            <div class="overflow-x-auto">
+            <div>
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
@@ -138,7 +138,7 @@
                                 </NuxtLink>
                                 <CommonDropdown title="Actions" icon="mdi:chevron-down">
                                     <button
-                                        v-for="([btn, action], index) in [['Update Status', 'update'], ['Cancel Order', 'cancel'], ['Override', 'override'], ['View History', 'history']]"
+                                        v-for="([btn, action], index) in [['Update Status', 'update'], ['Force Status', 'force'], ['Cancel Order', 'cancel'], ['Override', 'override'], ['View History', 'history']]"
                                         :key="index" @click.prevent="handleOrderAction(action, order)"
                                         class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
                                         {{ btn }}
@@ -156,12 +156,14 @@
         </div>
 
         <!-- Order Action Modals -->
-        <DashboardOrdersOrderStatusModal v-if="showStatusModal" :order="selectedOrder" @close="showStatusModal = false"
+        <DashboardOrdersStatusUpdateModal v-if="showUpdateModal" :order="selectedOrder" @close="showUpdateModal = false"
             @submit="updateOrderStatus" />
-        <DashboardOrdersOrderCancelModal v-if="showCancelModal" :order="selectedOrder" @close="showCancelModal = false"
+        <DashboardOrdersStatusForceModal v-if="showForceModal" :order="selectedOrder" @close="showForceModal = false"
+            @submit="forceOrderStatus" />
+        <DashboardOrdersCancelModal v-if="showCancelModal" :order="selectedOrder" @close="showCancelModal = false"
             @submit="cancelOrder" />
-        <DashboardOrdersOrderOverrideModal v-if="showOverrideModal" :order="selectedOrder"
-            @close="showOverrideModal = false" @submit="overrideOrder" />
+        <DashboardOrdersOverrideModal v-if="showOverrideModal" :order="selectedOrder" @close="showOverrideModal = false"
+            @submit="overrideOrder" />
     </div>
 </template>
 
@@ -208,7 +210,8 @@ const isLoading = ref(false)
 const error = ref<any>(null)
 
 // Modal states
-const showStatusModal = ref(false)
+const showUpdateModal = ref(false)
+const showForceModal = ref(false)
 const showCancelModal = ref(false)
 const showOverrideModal = ref(false)
 const selectedOrder = ref<any>(null)
@@ -270,7 +273,10 @@ const handleOrderAction = (action: string, order: any) => {
     selectedOrder.value = order
     switch (action) {
         case 'update':
-            showStatusModal.value = true
+            showUpdateModal.value = true
+            break
+        case 'force':
+            showForceModal.value = true
             break
         case 'cancel':
             showCancelModal.value = true
@@ -290,7 +296,20 @@ const updateOrderStatus = async (data: { status: OrderStatus, notes?: string }) 
             status: data.status,
             adminNotes: data.notes
         })
-        showStatusModal.value = false
+        showUpdateModal.value = false
+        fetchOrders()
+    } catch (err) {
+        console.error('Failed to update order:', err)
+    }
+}
+
+const forceOrderStatus = async (data: { status: OrderStatus, reason: string, force: boolean }) => {
+    try {
+        await $api.put(ENDPOINTS.ADMIN_ORDERS.FORCE_ORDER_STATUS(selectedOrder.value.id, data.status), {
+            reason: data.reason,
+            force: data.force
+        })
+        showForceModal.value = false
         fetchOrders()
     } catch (err) {
         console.error('Failed to update order:', err)

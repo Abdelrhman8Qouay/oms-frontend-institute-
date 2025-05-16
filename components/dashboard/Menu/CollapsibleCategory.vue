@@ -17,7 +17,7 @@ const toggle = () => {
         <button @click="toggle"
             class="flex items-center justify-between w-full p-3 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">
             <div class="flex items-center gap-2">
-                <Icon name="mdi-light:folder" class="text-gray-500" />
+                <Icon name="material-symbols-light:category" class="text-gray-500" />
                 <span class="font-medium">{{ category.name }}</span>
                 <span class="text-xs text-gray-500 ml-2">({{ category.items?.length || 0 }} items)</span>
             </div>
@@ -41,14 +41,14 @@ const toggle = () => {
                 No items in this category
             </div>
 
-            <div class="flex justify-end gap-2 pt-2 border-t border-gray-100 mt-1">
+            <!-- <div class="flex justify-end gap-2 pt-2 border-t border-gray-100 mt-1">
                 <button class="text-xs text-blue-600 hover:text-blue-800">
                     Add Item
                 </button>
                 <button class="text-xs text-gray-600 hover:text-gray-800">
                     Edit Category
                 </button>
-            </div>
+            </div> -->
         </div>
     </div>
 </template>

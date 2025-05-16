@@ -1,16 +1,18 @@
 <template>
     <div class="space-y-2">
         <h3 class="font-semibold">Order {{ orderIdFormat(order.id) }} </h3>
-        <h3 class="font-semibold">Order Queue: {{ order.dailyQueueNumber }}</h3>
+        <h3 class="font-semibold">Daily Queue Number:
+            {{ order.dailyQueueNumber }}
+        </h3>
         <div :class="typeBadgeClass(order.type)">Type: {{ formatType(order.type) }}</div>
         <div>Items: <div v-for="(item, index) in order.items" :key="index"
                 class="inline-block rounded-md mr-2 p-1 bg-gray-500 text-white text-[11px]">
                 {{
-                    formatReadableText(item.name) }}</div>
+                    formatReadableText(item.name) }} x{{ item.quantity }}</div>
         </div>
         <p>Total: ${{ fixedFraction(order.totalPrice, 2) }}</p>
-        <div class="text-sm text-gray-500">
-            <Icon name="mdi:clock-time-four-outline" class="w-4 h-4" />
+        <div class="text-sm text-gray-500 flex items-center gap-2">
+            <Icon name="mdi:clock-time-four-outline" />
             <span>
                 {{ formatDateTime(order.createdAt) }}
                 ({{ timeSince(order.createdAt) }} ago)
@@ -92,6 +94,7 @@ const props = defineProps({
     },
 });
 
+console.log(props.order.items)
 const emits = defineEmits(['claim-order', 'complete-order', 'cancel-order']);
 
 const isModalOpen = ref(false)

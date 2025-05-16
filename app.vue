@@ -2,7 +2,7 @@
   <div>
     <NuxtRouteAnnouncer />
     <NuxtLayout>
-      <NuxtPage />
+      <NuxtPage class="bg-gray-100" />
     </NuxtLayout>
   </div>
 </template>

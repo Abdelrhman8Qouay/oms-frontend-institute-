@@ -1,5 +1,5 @@
 <template>
-    <div class="relative inline-block text-left">
+    <div class="relative inline-block text-left z-[10000]">
         <button @click="isOpen = !isOpen"
             class="flex justify-center items-center w-full rounded-md border border-gray-300 shadow-sm px-3 py-1.5 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none">
             {{ title }}

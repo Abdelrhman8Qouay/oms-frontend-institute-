@@ -316,7 +316,7 @@
                             <div># {{ order.id }}</div>
                             <div>{{ order.customer?.username || order.customerDetails?.name
                                 || UserRole.GUEST
-                            }}</div>
+                                }}</div>
                             <div>${{ fixedFraction(order.totalPrice, 2) }}</div>
                         </div>
                         <p class="text-sm text-gray-500">
@@ -362,8 +362,17 @@ definePageMeta({
     layout: 'cashier',
 })
 
+interface UpdatedOrder {
+    order: OrderObject
+    orderId: string
+    status: OrderStatus
+    targetRoom: string
+    timestamp: string | Date
+}
+
 // Order ID input
 const orderIdInput = ref('')
+const prevRoomName = ref('')
 
 // Order data state
 const order = ref<OrderObject | null>(null)
@@ -384,7 +393,7 @@ const ordersError = ref<any>(null)
 const notificationSound = ref<HTMLAudioElement | null>(null)
 
 // Socket.IO
-const { isConnected, connectSocket, joinRoom, listenToEvent } = useSocketIo()
+const { isConnected, connectSocket, joinOrderRoom, listenToEvent, leaveRoom } = useSocketIo()
 
 // Computed timeline based on order status
 const orderTimeline = computed(() => {
@@ -444,7 +453,14 @@ const fetchOrder = async () => {
         )
 
         order.value = res.data
-        setupSocketListeners()
+
+        // Check previous room name to leave it
+        if (prevRoomName.value) {
+            leaveRoom(prevRoomName.value, 'leaveRoom')
+        }
+
+        // Setup Socket Listener
+        setupSocketListeners(order.value?.id as string)
     } catch (err) {
         orderError.value = err as Error
         order.value = null
@@ -455,18 +471,16 @@ const fetchOrder = async () => {
 }
 
 // Setup socket listeners for real-time updates
-const setupSocketListeners = () => {
+const setupSocketListeners = (orderId: string) => {
     if (!order.value) return
 
     connectSocket()
-    joinRoom([UserRole.CASHIER])
+    prevRoomName.value = joinOrderRoom(orderId || order.value.id, 'joinOrderRoom')
 
-    listenToEvent('orderUpdate', (updatedOrder: OrderObject) => {
+    listenToEvent('orderUpdate', (updatedOrder: UpdatedOrder) => {
         console.log('Order Updated: ', updatedOrder)
-        if (updatedOrder.id === order.value?.id) {
-            order.value = updatedOrder
-            playNotificationSound()
-        }
+        order.value = updatedOrder.order
+        playNotificationSound()
     })
 
     // listenToEvent('paymentUpdate', (data: { orderId: string; paymentStatus: string }) => {

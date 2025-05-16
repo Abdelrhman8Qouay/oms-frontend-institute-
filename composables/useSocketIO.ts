@@ -30,6 +30,14 @@ export const useSocketIo = () => {
             console.log('JoinRoom Response:', res)
         })
     }
+    const joinOrderRoom = (orderId: string, emitEvent: string = 'joinOrderRoom') => {
+        let roomName = ''
+        $socket.emit(emitEvent, orderId, (res: any) => {
+            console.log(emitEvent + ' Response: ', res)
+            roomName = res
+        })
+        return roomName
+    }
 
     const leaveRoom = (room: string, emitEvent: string = 'leaveRoom') => {
         $socket.emit(emitEvent, room, (res: any) => {
@@ -65,6 +73,7 @@ export const useSocketIo = () => {
         connectSocket,
         disconnectSocket,
         joinRoom,
+        joinOrderRoom,
         leaveRoom,
         listenToEvent,
         removeEventListener,
